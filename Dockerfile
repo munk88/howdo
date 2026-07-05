@@ -9,8 +9,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # 利用 Docker 缓存：先拷贝依赖文件
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package.json ./
+RUN npm install --no-audit --no-fund
 
 # 拷贝源码并构建
 COPY . .
