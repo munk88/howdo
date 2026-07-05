@@ -1,6 +1,6 @@
 # ============================================
 # howdo.icu Docker Compose
-# 用 jonasal/nginx-certbot 镜像：Nginx + Let's Encrypt 自动续期
+# jonasal/nginx-certbot: 自动 HTTPS + 反向代理
 # ============================================
 
 services:
@@ -25,13 +25,16 @@ services:
       - "443:443"
     environment:
       - CERTBOT_EMAIL=hello@howdo.icu
+      # 首次调试时设为 1，使用 Let's Encrypt 暂存环境（避免触发速率限制）
+      # 证书验证通过后改回 0 或删除此行
+      - STAGING=0
+      # 调试模式，输出详细日志
+      - DEBUG=0
     volumes:
-      # Nginx 配置（带 HTTPS）
-      - ./nginx/nginx-ssl.conf:/etc/nginx/user_conf.d/default.conf
-      # Let's Encrypt 证书持久化
+      # 用户配置（镜像会自动 symlink 到 conf.d/）
+      - ./nginx/nginx-ssl.conf:/etc/nginx/user_conf.d/default.conf:ro
+      # 证书持久化
       - nginx-certs:/etc/letsencrypt
-      - nginx-acme:/var/www/letsencrypt
-      - nginx-log:/var/log/nginx
     networks:
       - howdo-net
 
@@ -41,5 +44,3 @@ networks:
 
 volumes:
   nginx-certs:
-  nginx-acme:
-  nginx-log:
