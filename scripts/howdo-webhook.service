@@ -1,0 +1,22 @@
+[Unit]
+Description=howdo.icu Webhook Receiver
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/howdo
+Environment=WEBHOOK_SECRET=CHANGE_ME_TO_RANDOM_STRING
+ExecStart=/usr/bin/python3 /opt/howdo/scripts/webhook-server.py
+Restart=always
+RestartSec=5
+
+# 安全限制
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

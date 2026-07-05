@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build Docker Image Only
 
 on:
   push:
@@ -6,14 +6,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
 
       - name: Build Docker image
         run: |
@@ -22,28 +19,9 @@ jobs:
       - name: Save Docker image to tarball
         run: docker save howdo-blog:latest | gzip > howdo-blog.tar.gz
 
-      - name: Copy image to VPS
-        uses: easingthemes/ssh-deploy@main
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.VPS_HOST }}
-          REMOTE_USER: ${{ secrets.VPS_USER }}
-          SOURCE: 'howdo-blog.tar.gz'
-          TARGET: '/tmp/'
-          ARGS: '-rlgoDzvc'
-
-      - name: Deploy on VPS via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd ${{ secrets.VPS_DEPLOY_PATH }}
-            git pull origin main
-            docker load < /tmp/howdo-blog.tar.gz
-            docker compose down
-            docker compose up -d --build
-            docker image prune -f
-            rm -f /tmp/howdo-blog.tar.gz
-            echo "Deploy completed at $(date)"
+          name: howdo-blog-image
+          path: howdo-blog.tar.gz
+          retention-days: 7
