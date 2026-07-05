@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// 按年份分组
+const postsByYear = {};
+allPosts.forEach(post => {
+  const year = post.data.pubDate.getFullYear();
+  if (!postsByYear[year]) postsByYear[year] = [];
+  postsByYear[year].push(post);
+});
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+
+const formatMonthDay = (date) => {
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return { month: m, day: d };
+};
+---
+<BaseLayout title="归档 — howdo.icu" description="按时间顺序浏览所有文章">
+  <section class="archive-hero">
+    <div class="archive-hero-inner">
+      <span class="kicker">ARCHIVE</span>
+      <h1>归档</h1>
+      <p>按时间顺序浏览所有文章，从最新到最旧。</p>
+    </div>
+  </section>
+
+  {years.map(year => (
+    <section class="archive-year">
+      <div class="container">
+        <div class="archive-year-header">
+          <span class="archive-year-label">{year}</span>
+          <span class="archive-year-count">{postsByYear[year].length}篇文章</span>
+        </div>
+        <div class="archive-year-divider"></div>
+        {postsByYear[year].map(post => {
+          const { month, day } = formatMonthDay(post.data.pubDate);
+          return (
+            <a href={`/blog/${post.slug}`} class="archive-item">
+              <div class="archive-date">
+                <span class="month">{month}</span>
+                <span class="day">{day}</span>
+              </div>
+              <div class="archive-item-info">
+                <span class="archive-item-tag">{post.data.tags[0] || '未分类'}</span>
+                <span class="archive-item-title">{post.data.title}</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+</BaseLayout>

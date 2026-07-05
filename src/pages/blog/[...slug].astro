@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentIndex = allPosts.findIndex(p => p.slug === post.slug);
+const prevPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+
+const formatDate = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}.${m}.${d}`;
+};
+---
+<BaseLayout title={`${post.data.title} — howdo.icu`} description={post.data.description}>
+  <section class="article-hero">
+    <div class="article-hero-inner">
+      {post.data.tags.length > 0 && <span class="article-tag">{post.data.tags[0]}</span>}
+      <h1>{post.data.title}</h1>
+      <span class="post-meta">{formatDate(post.data.pubDate)} · {post.data.readingTime} 分钟阅读 · 由 howdo 撰写</span>
+      <div class="article-cover">封面图占位</div>
+    </div>
+  </section>
+
+  <article class="article-body">
+    <Content />
+    <p class="article-signature">— howdo<br />{formatDate(post.data.pubDate)}</p>
+  </article>
+
+  <nav class="post-nav">
+    <div class="post-nav-inner">
+      {prevPost && (
+        <a href={`/blog/${prevPost.slug}`} class="post-nav-item prev">
+          <span class="post-nav-label">← 上一篇</span>
+          <span class="post-meta">{formatDate(prevPost.data.pubDate)} · {prevPost.data.tags[0] || '未分类'}</span>
+          <span class="post-nav-title">{prevPost.data.title}</span>
+        </a>
+      )}
+      {nextPost && (
+        <a href={`/blog/${nextPost.slug}`} class="post-nav-item next">
+          <span class="post-nav-label">下一篇 →</span>
+          <span class="post-meta">{formatDate(nextPost.data.pubDate)} · {nextPost.data.tags[0] || '未分类'}</span>
+          <span class="post-nav-title">{nextPost.data.title}</span>
+        </a>
+      )}
+    </div>
+  </nav>
+</BaseLayout>

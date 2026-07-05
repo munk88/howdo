@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const featuredPost = allPosts[0];
+const restPosts = allPosts.slice(1, 6);
+
+const formatDate = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}.${m}.${d}`;
+};
+---
+<BaseLayout>
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="kicker">PERSONAL BLOG · EST. 2026</span>
+      <h1>记录每一件<br />「如何做」的事。</h1>
+      <p class="hero-sub">howdo.icu 是我的个人博客。这里记录我在技术、生活和思考中探索「如何做」的全过程——从代码到厨房，从阅读到行走，所有值得停下来写下来的事。</p>
+    </div>
+  </section>
+
+  {featuredPost && (
+    <section class="featured">
+      <div class="container">
+        <span class="kicker">最新文章</span>
+        <div class="featured-post">
+          <span class="post-meta">{formatDate(featuredPost.data.pubDate)} · {featuredPost.data.tags[0] || '未分类'} · {featuredPost.data.readingTime} 分钟阅读</span>
+          <a href={`/blog/${featuredPost.slug}`}><h2>{featuredPost.data.title}</h2></a>
+          <p class="excerpt">{featuredPost.data.description}</p>
+          <a href={`/blog/${featuredPost.slug}`} class="read-more">继续阅读 →</a>
+        </div>
+        <hr class="divider" style="margin-top: 40px;" />
+      </div>
+    </section>
+  )}
+
+  {restPosts.length > 0 && (
+    <section class="post-list">
+      <div class="container">
+        <span class="kicker">更多文章</span>
+        {restPosts.map(post => (
+          <a href={`/blog/${post.slug}`} class="post-item">
+            <span class="post-meta">{formatDate(post.data.pubDate)} · {post.data.tags[0] || '未分类'} · {post.data.readingTime} 分钟阅读</span>
+            <h3>{post.data.title}</h3>
+          </a>
+        ))}
+        <a href="/archive" class="view-all">查看全部文章 →</a>
+      </div>
+    </section>
+  )}
+
+  <section class="about-section">
+    <div class="about-inner">
+      <span class="kicker">关于</span>
+      <p class="about-text">我是这个博客的作者。白天写代码，晚上读书散步。howdo.icu 是我放慢脚步、整理思绪的地方——如果某篇文章恰好帮到了你，那就是它存在的意义。</p>
+      <div class="about-social">
+        <span>Email</span><span>·</span><span>GitHub</span><span>·</span><span>RSS</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="newsletter" id="newsletter">
+    <div class="newsletter-inner">
+      <h2>订阅 howdo.icu</h2>
+      <p>每当有新文章发布时，你会收到一封邮件。不发垃圾邮件，不卖邮箱地址。</p>
+      <form class="newsletter-form" onsubmit="event.preventDefault(); alert('感谢订阅！');">
+        <input type="email" class="email-input" placeholder="your@email.com" required />
+        <button type="submit" class="subscribe-btn">订阅</button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>

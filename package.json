@@ -1,0 +1,17 @@
+{
+  "name": "howdo-icu",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "howdo.icu 个人博客 - 记录每一件「如何做」的事",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "@astrojs/rss": "^4.0.7"
+  }
+}

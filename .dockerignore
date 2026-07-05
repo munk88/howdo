@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.github
+.vscode
+.idea
+*.log
+.DS_Store
+Thumbs.db
+nginx-certs
+nginx-acme
+nginx-log
+howdo-blog.tar.gz

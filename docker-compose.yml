@@ -1,0 +1,45 @@
+# ============================================
+# howdo.icu Docker Compose
+# 用 jonasal/nginx-certbot 镜像：Nginx + Let's Encrypt 自动续期
+# ============================================
+
+services:
+  web:
+    image: howdo-blog:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: howdo-blog
+    restart: unless-stopped
+    networks:
+      - howdo-net
+
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    container_name: howdo-nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - CERTBOT_EMAIL=hello@howdo.icu
+    volumes:
+      # Nginx 配置（带 HTTPS）
+      - ./nginx/nginx-ssl.conf:/etc/nginx/user_conf.d/default.conf
+      # Let's Encrypt 证书持久化
+      - nginx-certs:/etc/letsencrypt
+      - nginx-acme:/var/www/letsencrypt
+      - nginx-log:/var/log/nginx
+    networks:
+      - howdo-net
+
+networks:
+  howdo-net:
+    driver: bridge
+
+volumes:
+  nginx-certs:
+  nginx-acme:
+  nginx-log:
