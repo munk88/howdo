@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../site.config';
+
+const all = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const totalMinutes = all.reduce(
+  (s, p) => s + Math.max(1, Math.round((p.body || '').replace(/\s/g, '').length / 400)),
+  0
+);
+---
+<BaseLayout>
+  <section class="hero">
+    <img class="hero__bg" src={siteConfig.hero} alt="书桌与晨光" />
+    <div class="hero__veil"></div>
+    <div class="hero__inner">
+      <p class="hero__kicker">个人博客 · Personal Notes</p>
+      <h1 class="hero__title">{siteConfig.name}</h1>
+      <p class="hero__sub">{siteConfig.tagline}</p>
+      <div class="hero__stats">
+        <div><b>{all.length}</b>篇文章</div>
+        <div><b>{siteConfig.categories.length}</b>个栏目</div>
+        <div><b>{totalMinutes}</b>分钟阅读量</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></svg>
+      <input id="search-input" type="search" placeholder="搜索标题、标签或正文…" aria-label="搜索文章" />
+    </div>
+    <div class="chips" id="category-chips" role="group" aria-label="按栏目筛选">
+      <button type="button" class="chip active" data-cat="全部">全部</button>
+      {siteConfig.categories.map((c) => (
+        <button type="button" class="chip cat-{c}" data-cat={c}>{c}</button>
+      ))}
+    </div>
+  </section>
+
+  <div class="list-meta">
+    <h2 id="list-title">全部文章</h2>
+    <span class="count" id="list-count"></span>
+  </div>
+
+  <section class="post-list" id="post-list" aria-live="polite">
+    {all.map((p) => (
+      <PostCard
+        title={p.data.title}
+        description={p.data.description}
+        date={p.data.date}
+        category={p.data.category}
+        tags={p.data.tags}
+        body={p.body}
+        slug={p.id}
+      />
+    ))}
+  </section>
+
+  <div class="empty" id="empty-state" hidden>
+    <strong>没有找到相关文章</strong>试试更换关键词，或切换其他栏目
+  </div>
+
+  <script>
+    const input = document.getElementById('search-input');
+    const chips = Array.from(document.querySelectorAll('.chip[data-cat]'));
+    const cards = Array.from(document.querySelectorAll('.post-card'));
+    const listTitle = document.getElementById('list-title');
+    const listCount = document.getElementById('list-count');
+    const emptyBox = document.getElementById('empty-state');
+    let cat = '全部';
+
+    function apply() {
+      const q = input ? input.value.trim().toLowerCase() : '';
+      let shown = 0;
+      cards.forEach((c) => {
+        const okCat = cat === '全部' || c.dataset.cat === cat;
+        const okQ = !q || (c.dataset.search || '').includes(q);
+        const ok = okCat && okQ;
+        c.hidden = !ok;
+        if (ok) shown++;
+      });
+      listCount.textContent = q ? `找到 ${shown} 篇，关键词“${input.value.trim()}”` : `共 ${shown} 篇`;
+      listTitle.textContent = cat === '全部' ? (q ? '搜索结果' : '全部文章') : `栏目 · ${cat}`;
+      if (emptyBox) emptyBox.hidden = shown > 0;
+    }
+
+    chips.forEach((b) =>
+      b.addEventListener('click', () => {
+        cat = b.dataset.cat;
+        chips.forEach((x) => x.classList.toggle('active', x === b));
+        apply();
+      })
+    );
+    if (input) input.addEventListener('input', apply);
+    apply();
+  </script>
+</BaseLayout>

@@ -1,0 +1,54 @@
+# ============================================================
+# 自动部署：推送到 main 分支 → 构建静态站 → 部署到 VPS
+#
+# 首次使用前需要在 GitHub 仓库配置 3 个 Actions Secret：
+#   VPS_HOST    = 你的 VPS 公网 IP 或域名
+#   VPS_USER    = SSH 登录用户名（如 root 或 ubuntu）
+#   VPS_SSH_KEY = 部署私钥内容（与 VPS authorized_keys 配对的私钥）
+# ============================================================
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build
+
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "dist/*,Caddyfile,docker-compose.yml"
+          target: "/opt/blog"
+          strip_components: 0
+
+      - name: Restart container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/blog
+            docker compose up -d
+            docker image prune -f || true

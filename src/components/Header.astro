@@ -1,0 +1,25 @@
+---
+import { siteConfig } from '../site.config';
+const path = Astro.url.pathname;
+const isHome = path === '/';
+const isArchive = path === '/archive/';
+const isAbout = path === '/about/';
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand__stamp">{siteConfig.name.charAt(0)}</span>
+      <span class="brand__name">{siteConfig.name}</span>
+      <span class="brand__tagline">{siteConfig.tagline}</span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="/" class:list={[{ active: isHome }]}>首页</a>
+      <a href="/archive/" class:list={[{ active: isArchive }]}>归档</a>
+      <a href="/about/" class:list={[{ active: isAbout }]}>关于</a>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="切换明暗主题">
+        <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" /></svg>
+        <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" /></svg>
+      </button>
+    </nav>
+  </div>
+</header>

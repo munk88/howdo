@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  category: string;
+  tags: string[];
+  body: string;
+  slug: string;
+}
+const { title, description, date, category, tags, body, slug } = Astro.props;
+const minutes = Math.max(1, Math.round((body || '').replace(/\s/g, '').length / 400));
+const dateStr = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`;
+const searchText = `${title} ${description} ${category} ${tags.join(' ')}`.toLowerCase();
+---
+<article class="post-card" data-cat={category} data-search={searchText}>
+  <div class="post-card__spine cat-{category}"></div>
+  <a class="post-card__link" href={`/posts/${slug}/`}>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="tag-chip cat-{category}">{category}</span>
+        <time datetime={date.toISOString()}>{dateStr}</time>
+        <span>{minutes} 分钟</span>
+      </div>
+      <h3 class="post-card__title">{title}</h3>
+      <p class="post-card__excerpt">{description}</p>
+      <span class="post-card__read">
+        继续阅读
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" /></svg>
+      </span>
+    </div>
+  </a>
+</article>

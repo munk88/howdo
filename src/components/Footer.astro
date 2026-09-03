@@ -1,0 +1,12 @@
+---
+import { siteConfig } from '../site.config';
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="brand">
+      <span class="brand__stamp" style="width:30px;height:30px;font-size:16px;">{siteConfig.name.charAt(0)}</span>
+      <span class="brand__name">{siteConfig.name}</span>
+    </div>
+    <p>© {new Date().getFullYear()} {siteConfig.name} · Astro 静态构建 · 专注阅读体验</p>
+  </div>
+</footer>

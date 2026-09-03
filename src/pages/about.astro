@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../site.config';
+---
+<BaseLayout title="关于">
+  <section class="page">
+    <div class="page-head">
+      <h1>关于</h1>
+      <p>{siteConfig.intro}</p>
+    </div>
+    <div class="about-card">
+      <div class="about-hero"><img src={siteConfig.hero} alt="书桌与晨光" /></div>
+      <div class="about-body">
+        <img class="about-avatar" src={siteConfig.avatar} alt={`${siteConfig.author}的头像`} />
+        <h2>{siteConfig.author}</h2>
+        <div class="role">写作者 · 读者 · 长跑爱好者</div>
+        <p>
+          欢迎来到我的角落。这里不追逐热点，只认真记录那些值得慢下来想一想的事：一本好书、一次技术实践、一段日常里的微光，以及关于“如何生活”的零碎答案。如果你在读某篇文章时有所共鸣，那就是我写它的全部意义。
+        </p>
+        <div class="about-cats">
+          {siteConfig.categories.map((c) => <span class="tag-chip cat-{c}">{c}</span>)}
+        </div>
+        <div class="about-links">
+          <a href="mailto:hello@example.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m3.5 7 8.5 6 8.5-6" /></svg>
+            写信给我
+          </a>
+          <a href="/archive/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v3H4zM5 9h14l-1 11H6L5 9zM9 13h6" /></svg>
+            浏览归档
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const d = post.data.date;
+const dateStr = `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+const minutes = Math.max(1, Math.round((post.body || '').replace(/\s/g, '').length / 400));
+
+const all = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const idx = all.findIndex((x) => x.id === post.id);
+const prev = idx < all.length - 1 ? all[idx + 1] : null;
+const next = idx > 0 ? all[idx - 1] : null;
+---
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="article-view">
+    <a class="back-link" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 5.5 4.5 12 11 18.5" /></svg>
+      <span>返回列表</span>
+    </a>
+
+    <header class="article-head">
+      <div class="post-card__meta">
+        <span class="tag-chip cat-{post.data.category}">{post.data.category}</span>
+        <time datetime={post.data.date.toISOString()}>{dateStr}</time>
+        <span>{minutes} 分钟</span>
+      </div>
+      <h1>{post.data.title}</h1>
+      <p class="lead">{post.data.description}</p>
+    </header>
+
+    <div class="article-layout">
+      <aside class="article-toc" aria-label="文章目录">
+        <div class="article-toc__title">目录</div>
+        <ol id="toc-list"></ol>
+      </aside>
+      <div class="article-body" id="article-body">
+        <Content />
+      </div>
+    </div>
+
+    <div class="article-tags">
+      <span class="tag-label">标签</span>
+      {post.data.tags.map((t) => <span class="tag-chip">{t}</span>)}
+    </div>
+
+    <nav class="article-nav" aria-label="上一篇与下一篇">
+      {prev ? (
+        <a href={`/posts/${prev.id}/`}>
+          <div class="dir">上一篇</div>
+          <div class="t">{prev.data.title}</div>
+        </a>
+      ) : (
+        <span></span>
+      )}
+      {next ? (
+        <a class="next" href={`/posts/${next.id}/`}>
+          <div class="dir">下一篇</div>
+          <div class="t">{next.data.title}</div>
+        </a>
+      ) : (
+        <span></span>
+      )}
+    </nav>
+  </article>
+
+  <script>
+    // 文章目录：由正文 h2 生成 + 点击滚动 + 滚动高亮
+    const list = document.getElementById('toc-list');
+    const h2s = Array.from(document.querySelectorAll('.article-body h2[id]'));
+    if (list && h2s.length) {
+      list.innerHTML = h2s
+        .map((h) => `<li><button type="button" data-toc="${h.id}">${h.textContent}</button></li>`)
+        .join('');
+      const btns = Array.from(list.querySelectorAll('button'));
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      btns.forEach((b) =>
+        b.addEventListener('click', () => {
+          const el = document.getElementById(b.dataset.toc);
+          if (!el) return;
+          const top = el.getBoundingClientRect().top + window.scrollY - 76;
+          window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+        })
+      );
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((en) => {
+              if (en.isIntersecting) {
+                btns.forEach((x) => x.classList.toggle('current', x.dataset.toc === en.target.id));
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' }
+        );
+        h2s.forEach((h) => obs.observe(h));
+      }
+    }
+  </script>
+</BaseLayout>
