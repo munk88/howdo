@@ -46,75 +46,54 @@ tags: [标签1, 标签2]
 
 整体流程：**你写文章 → push 到 GitHub → Actions 自动构建 → 部署到 VPS → 域名访问**。
 
-### 第 1 步：推送到 GitHub
+> **部署架构**（适配 VPS 已有主机 Caddy 占用 80/443）：
+> 博客容器只在 VPS 内网 `127.0.0.1:8090` 提供 HTTP 静态服务；
+> VPS 主机上的 Caddy（负责你其他服务的那台）把 `howdo.icu` 反向代理到该端口并自动签发 HTTPS。
+> 已部署上线：`https://howdo.icu`，你的现有服务不受影响。
 
-在项目目录执行：
-
-```bash
-git init
-git add .
-git commit -m "init blog"
-# 在 GitHub 网页新建一个仓库（如 blog），然后：
-git remote add origin git@github.com:你的用户名/blog.git
-git branch -M main
-git push -u origin main
-```
-
-### 第 2 步：在 VPS 上跑一次初始化脚本
-
-SSH 登录 VPS 后：
-
-```bash
-# 把脚本拷到 VPS 或直接复制内容执行
-bash setup-vps.sh
-```
-
-脚本会自动安装 Docker、创建 `/opt/blog` 部署目录。
-
-### 第 3 步：配置 SSH 部署密钥（Actions → VPS）
-
-在本机生成一对密钥，**公钥**加入 VPS 的 `~/.ssh/authorized_keys`，**私钥**填进 GitHub Secret：
-
-```bash
-ssh-keygen -t ed25519 -C "blog-deploy" -f ~/.ssh/blog_deploy
-# 公钥内容：
-cat ~/.ssh/blog_deploy.pub
-# 把它追加到 VPS 上 ~/.ssh/authorized_keys（用你部署用的那个用户）
-```
+### 第 1 步：配置 GitHub Secrets（一次性）
 
 GitHub 仓库 → **Settings → Secrets and variables → Actions → New repository secret**，添加三个：
 
-| Secret 名 | 内容 |
+| Secret 名 | 值 |
 | --- | --- |
-| `VPS_HOST` | 你的 VPS 公网 IP 或域名 |
-| `VPS_USER` | SSH 登录用户名（如 `root` 或 `ubuntu`） |
-| `VPS_SSH_KEY` | `cat ~/.ssh/blog_deploy`（私钥全文） |
+| `VPS_HOST` | `62.234.53.137` |
+| `VPS_USER` | `ubuntu` |
+| `VPS_SSH_KEY` | 部署私钥全文（`~/.ssh/blog_deploy`，含 BEGIN/END） |
 
-### 第 4 步：绑定域名
+> 若尚未生成部署密钥：`ssh-keygen -t ed25519 -C "blog-deploy" -f ~/.ssh/blog_deploy`，
+> 公钥（`.pub`）追加到 VPS 上 `ubuntu` 用户的 `~/.ssh/authorized_keys`。
 
-1. 在域名服务商处，把你的域名加一条 **A 记录**，指向 VPS 公网 IP；
-2. 把仓库里两个文件中的 `blog.example.com` 改成你的真实域名：
-   - `Caddyfile`（Caddy 会自动签发/续期 HTTPS 证书）
-   - `astro.config.mjs` 里的 `site` 字段
+### 第 2 步：VPS 一次性初始化
 
-### 第 5 步：发布
+SSH 登录 VPS 后运行（装 Docker、建 `/opt/blog`、加入 docker 组）：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/munk88/howdo/main/deploy/setup-vps.sh | bash
+```
+
+### 第 3 步：确认域名解析
+
+`howdo.icu` 已加 A 记录 → `62.234.53.137`。主机 Caddy 的 `howdo.icu` 反向代理站点（`/etc/caddy/acli.d/sites/howdo.caddy`）已配置好；若被面板重建，CI 会在下次部署时自动补回。
+
+### 第 4 步：发布
 
 ```bash
 git add .
-git commit -m "set domain"
+git commit -m "update"
 git push
 ```
 
-推送后，GitHub Actions 自动：构建静态站 → 上传到 VPS → 重启 Caddy 容器。
-稍等一两分钟，访问 `https://你的域名` 即可看到最新内容。
+推送后，GitHub Actions 自动：构建静态站 → 上传到 `/opt/blog` → 启动/更新博客容器。
+稍等一两分钟，访问 `https://howdo.icu` 即可看到最新内容。
 
 > 之后每次发布：**写文章 → git push**，其余全自动。
 
 ## 五、常见问题
 
-- **不想用 Caddy / 想换 Nginx？** 把 `docker-compose.yml` 里的镜像换成 `nginx:alpine`，并自己配置证书即可。
 - **GitHub Actions 部署失败？** 检查三个 Secret 是否填写正确、VPS 是否放行了 22 端口、`VPS_SSH_KEY` 私钥与 authorized_keys 公钥是否配对。
 - **HTTPS 证书没生效？** 确认域名 A 记录已解析到 VPS 且 80/443 端口已放行，Caddy 会自动重试。
+- **博客容器端口？** 博客容器绑定 `127.0.0.1:8090`（仅内网），不占用 80/443，与主机 Caddy 无冲突。
 - **文章不显示？** 检查 frontmatter 是否有 `draft: true`，或文件是否在 `src/content/posts/` 下。
 
 ## 目录结构

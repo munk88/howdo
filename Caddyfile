@@ -1,16 +1,10 @@
 # ============================================================
-# Caddy 站点配置
-# 你的域名：howdo.icu（Caddy 会自动签发并续期 HTTPS 证书）
+# 博客容器内部 Caddy 配置：仅提供 HTTP 静态服务（容器内 :80）
+# 对外 HTTPS 由 VPS 主机上的 Caddy 反向代理到本容器。
 # ============================================================
-howdo.icu {
+:80 {
 	root * /srv
 	encode gzip
 	file_server
 	try_files {path} {path}/ /404.html
-
-	header {
-		-Server
-		X-Content-Type-Options nosniff
-		Referrer-Policy strict-origin-when-cross-origin
-	}
 }

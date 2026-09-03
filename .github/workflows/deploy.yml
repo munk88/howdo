@@ -2,9 +2,13 @@
 # 自动部署：推送到 main 分支 → 构建静态站 → 部署到 VPS
 #
 # 首次使用前需要在 GitHub 仓库配置 3 个 Actions Secret：
-#   VPS_HOST    = 你的 VPS 公网 IP 或域名
-#   VPS_USER    = SSH 登录用户名（如 root 或 ubuntu）
+#   VPS_HOST    = 你的 VPS 公网 IP 或域名（62.234.53.137）
+#   VPS_USER    = SSH 登录用户名（ubuntu）
 #   VPS_SSH_KEY = 部署私钥内容（与 VPS authorized_keys 配对的私钥）
+#
+# 部署架构（适配 VPS 现有主机 Caddy 占用 80/443）：
+#   博客容器在本机 127.0.0.1:8090 提供 HTTP，
+#   主机 Caddy 将 howdo.icu 反向代理到该端口并负责 HTTPS。
 # ============================================================
 name: Build & Deploy
 
@@ -18,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -52,7 +56,7 @@ jobs:
           target: "/opt/blog"
           strip_components: 0
 
-      - name: Restart container
+      - name: Start container & ensure vhost
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -61,4 +65,10 @@ jobs:
           script: |
             cd /opt/blog
             docker compose up -d
+            # 确保主机 Caddy 存在 howdo.icu 反向代理（若被面板重建则自动补回）
+            if [ ! -f /etc/caddy/acli.d/sites/howdo.caddy ]; then
+              printf 'howdo.icu {\n    reverse_proxy 127.0.0.1:8090\n}\n' | sudo tee /etc/caddy/acli.d/sites/howdo.caddy > /dev/null
+              sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+              sudo systemctl restart caddy
+            fi
             docker image prune -f || true

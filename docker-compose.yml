@@ -1,21 +1,14 @@
 # 个人博客 Docker 部署（VPS 上运行）
-# 使用官方 Caddy 镜像：托管静态站 + 自动申请/续期 HTTPS 证书
-# 目录结构：./dist（构建产物）、./Caddyfile（站点配置）
+# 说明：VPS 主机已有 Caddy 占用 80/443 并负责 HTTPS，
+#       因此本容器只在内网端口提供 HTTP 静态服务，
+#       由主机 Caddy 将 howdo.icu 反向代理到 127.0.0.1:8090。
 services:
   blog:
-    image: caddy:2-alpine
+    image: docker.1ms.run/library/caddy:2-alpine
     container_name: blog
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - "127.0.0.1:8090:80"
     volumes:
       - ./dist:/srv:ro
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-
-volumes:
-  caddy_data:
-  caddy_config:
