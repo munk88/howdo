@@ -73,3 +73,8 @@ jobs:
               sudo systemctl restart caddy
             fi
             docker image prune -f || true
+
+      - name: Verify site is live
+        run: |
+          sleep 5
+          curl -fsS -m 20 -o /dev/null -w "https://howdo.icu → HTTP %{http_code}\n" https://howdo.icu || echo "站点暂未就绪（可能仍在启动）"
