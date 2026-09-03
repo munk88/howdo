@@ -32,13 +32,23 @@ jobs:
       - name: Build static site
         run: npm run build
 
-      - name: Upload to VPS
+      - name: Upload site (dist)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "dist/*,Caddyfile,docker-compose.yml"
+          source: "dist"
+          target: "/opt/blog"
+          strip_components: 0
+
+      - name: Upload config (Caddyfile, docker-compose.yml)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "Caddyfile,docker-compose.yml"
           target: "/opt/blog"
           strip_components: 0
 
