@@ -44,5 +44,5 @@ export const siteConfig = {
   },
 
   // 页脚备案号（填你自己的；没有可留空字符串）
-  icp: '沪ICP备XXXXXXXX号'
+  icp: '蒙ICP备2026004526号'
 };
