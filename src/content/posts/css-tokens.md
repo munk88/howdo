@@ -2,7 +2,7 @@
 title: '用 CSS 变量管理一套干净的设计令牌'
 description: '色彩、间距、字体——把它们抽象成一套可复用的设计令牌，前端维护成本能降一大截。'
 date: 2026-05-18
-category: 技术
+category: 技术实践
 tags: [CSS, 设计系统, 前端]
 ---
 

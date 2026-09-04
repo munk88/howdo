@@ -3,10 +3,13 @@ import { siteConfig } from '../site.config';
 ---
 <footer class="site-footer">
   <div class="container footer-inner">
-    <div class="brand">
-      <span class="brand__stamp" style="width:30px;height:30px;font-size:16px;">{siteConfig.name.charAt(0)}</span>
-      <span class="brand__name">{siteConfig.name}</span>
+    <div class="footer-left">
+      <span class="footer-name">{siteConfig.name}</span>
+      <span class="footer-line">{siteConfig.intro[0]}</span>
     </div>
-    <p>© {new Date().getFullYear()} {siteConfig.name} · Astro 静态构建 · 专注阅读体验</p>
+    <div class="footer-right">
+      <span>© {new Date().getFullYear()} {siteConfig.author}. All rights reserved.</span>
+      {siteConfig.icp && <span class="footer-icp">{siteConfig.icp}</span>}
+    </div>
   </div>
 </footer>

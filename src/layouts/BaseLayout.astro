@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { siteConfig } from '../site.config';
+import { getCollection } from 'astro:content';
 import '../styles/global.css';
 
 interface Props {
@@ -11,6 +12,18 @@ interface Props {
 const { title, description } = Astro.props;
 const pageTitle = title ? `${title} · ${siteConfig.name}` : `${siteConfig.name} · ${siteConfig.tagline}`;
 const pageDesc = description ?? siteConfig.tagline;
+
+// 全局搜索索引（注入到每个页面，供搜索遮罩使用）
+const searchIndex = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .map((p) => ({
+    title: p.data.title,
+    slug: p.id,
+    category: p.data.category,
+    tags: p.data.tags,
+    desc: p.data.description,
+    date: p.data.date.toISOString().slice(0, 10)
+  }));
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -42,6 +55,20 @@ const pageDesc = description ?? siteConfig.tagline;
       <slot />
     </main>
     <Footer />
+
+    <!-- 全局搜索遮罩 -->
+    <div class="search-overlay" id="search-overlay" hidden>
+      <div class="search-panel" role="dialog" aria-label="搜索文章">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></svg>
+          <input id="search-input" type="search" placeholder="搜索标题、标签或正文…" autocomplete="off" />
+          <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">Esc</button>
+        </div>
+        <ul class="search-results" id="search-results"></ul>
+      </div>
+    </div>
+
+    <script type="application/json" id="search-index" is:inline>{JSON.stringify(searchIndex)}</script>
     <button class="to-top" id="to-top" type="button" aria-label="回到顶部">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" /></svg>
     </button>

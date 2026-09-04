@@ -29,7 +29,7 @@ const next = idx > 0 ? all[idx - 1] : null;
 
     <header class="article-head">
       <div class="post-card__meta">
-        <span class="tag-chip cat-{post.data.category}">{post.data.category}</span>
+        <span class={`tag-chip cat-${post.data.category}`}>{post.data.category}</span>
         <time datetime={post.data.date.toISOString()}>{dateStr}</time>
         <span>{minutes} 分钟</span>
       </div>

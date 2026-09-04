@@ -6,7 +6,7 @@ import { siteConfig } from '../site.config';
   <section class="page">
     <div class="page-head">
       <h1>关于</h1>
-      <p>{siteConfig.intro}</p>
+      <p>{siteConfig.intro.join('')}</p>
     </div>
     <div class="about-card">
       <div class="about-hero"><img src={siteConfig.hero} alt="书桌与晨光" /></div>
@@ -18,7 +18,7 @@ import { siteConfig } from '../site.config';
           欢迎来到我的角落。这里不追逐热点，只认真记录那些值得慢下来想一想的事：一本好书、一次技术实践、一段日常里的微光，以及关于“如何生活”的零碎答案。如果你在读某篇文章时有所共鸣，那就是我写它的全部意义。
         </p>
         <div class="about-cats">
-          {siteConfig.categories.map((c) => <span class="tag-chip cat-{c}">{c}</span>)}
+          {siteConfig.categories.map((c) => <span class={`tag-chip cat-${c.name}`}>{c.name}</span>)}
         </div>
         <div class="about-links">
           <a href="mailto:hello@example.com">

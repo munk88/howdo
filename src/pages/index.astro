@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../site.config';
 
@@ -8,95 +7,138 @@ const all = (await getCollection('posts'))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const totalMinutes = all.reduce(
-  (s, p) => s + Math.max(1, Math.round((p.body || '').replace(/\s/g, '').length / 400)),
-  0
-);
+const byCat = (name) => all.filter((p) => p.data.category === name);
+const featured = siteConfig.featured
+  .map((id) => all.find((p) => p.id === id))
+  .filter(Boolean);
+
+function minutes(p) {
+  return Math.max(1, Math.round((p.body || '').replace(/\s/g, '').length / 400));
+}
+function fmt(d) {
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
 ---
 <BaseLayout>
-  <section class="hero">
-    <img class="hero__bg" src={siteConfig.hero} alt="书桌与晨光" />
-    <div class="hero__veil"></div>
-    <div class="hero__inner">
-      <p class="hero__kicker">个人博客 · Personal Notes</p>
-      <h1 class="hero__title">{siteConfig.name}</h1>
-      <p class="hero__sub">{siteConfig.tagline}</p>
-      <div class="hero__stats">
-        <div><b>{all.length}</b>篇文章</div>
-        <div><b>{siteConfig.categories.length}</b>个栏目</div>
-        <div><b>{totalMinutes}</b>分钟阅读量</div>
+  <!-- ===== Hero：左介绍 + 右主题地图 ===== -->
+  <section class="hero-split">
+    <div class="hero-left">
+      <h1 class="hero-title">{siteConfig.name}</h1>
+      <p class="hero-tagline">{siteConfig.tagline}</p>
+      <div class="hero-intro">
+        {siteConfig.intro.map((line) => <p>{line}</p>)}
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#featured">从这里开始 →</a>
+        <a class="btn btn-outline" href="/about/">关于我</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <h2 class="section-label">长期探索的主题</h2>
+      <div class="theme-grid">
+        {siteConfig.themes.map((t) => (
+          <div class="theme-item">
+            <div class="theme-name">{t.name}</div>
+            {t.items.map((it) => (
+              <div class="theme-sub">{it}</div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div class="motto">
+        <span class="motto-zh">{siteConfig.motto.zh}</span>
+        <span class="motto-en">{siteConfig.motto.en}</span>
       </div>
     </div>
   </section>
 
-  <section class="toolbar">
-    <div class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></svg>
-      <input id="search-input" type="search" placeholder="搜索标题、标签或正文…" aria-label="搜索文章" />
+  <!-- ===== 从这里开始 ===== -->
+  <section class="block" id="featured">
+    <div class="block-head">
+      <div>
+        <h2>从这里开始</h2>
+        <p>如果你不知道先看什么，可以从这三篇开始。</p>
+      </div>
+      <a class="more" href="/archive/">查看全部 →</a>
     </div>
-    <div class="chips" id="category-chips" role="group" aria-label="按栏目筛选">
-      <button type="button" class="chip active" data-cat="全部">全部</button>
-      {siteConfig.categories.map((c) => (
-        <button type="button" class="chip cat-{c}" data-cat={c}>{c}</button>
+    <div class="featured-grid">
+      {featured.map((p) => (
+        <a class="f-card" href={`/posts/${p.id}/`}>
+          <span class={`tag-chip cat-${p.data.category}`}>{p.data.category}</span>
+          <h3>{p.data.title}</h3>
+          <p class="f-desc">{p.data.description}</p>
+          <span class="f-read">{minutes(p)}分钟阅读</span>
+        </a>
       ))}
     </div>
   </section>
 
-  <div class="list-meta">
-    <h2 id="list-title">全部文章</h2>
-    <span class="count" id="list-count"></span>
-  </div>
-
-  <section class="post-list" id="post-list" aria-live="polite">
-    {all.map((p) => (
-      <PostCard
-        title={p.data.title}
-        description={p.data.description}
-        date={p.data.date}
-        category={p.data.category}
-        tags={p.data.tags}
-        body={p.body}
-        slug={p.id}
-      />
-    ))}
+  <!-- ===== 三大栏目 ===== -->
+  <section class="block">
+    <div class="cat-cols">
+      {siteConfig.categories.map((c) => (
+        <div class="cat-col">
+          <h2 class="cat-col__name">{c.name}</h2>
+          <p class="cat-col__desc">{c.desc}</p>
+          <ul class="cat-col__list">
+            {byCat(c.name).slice(0, 5).map((p) => (
+              <li>
+                <a class="cat-col__item" href={`/posts/${p.id}/`}>
+                  <span class="t">{p.data.title}</span>
+                  <time>{fmt(p.data.date)}</time>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="more" href={`/archive/?cat=${encodeURIComponent(c.name)}`}>查看全部 →</a>
+        </div>
+      ))}
+    </div>
   </section>
 
-  <div class="empty" id="empty-state" hidden>
-    <strong>没有找到相关文章</strong>试试更换关键词，或切换其他栏目
+  <!-- ===== 最近更新 + 现在侧栏 ===== -->
+  <div class="bottom-split">
+    <section class="block recent">
+      <div class="block-head">
+        <div>
+          <h2>最近更新</h2>
+        </div>
+        <a class="more" href="/archive/">查看全部文章 →</a>
+      </div>
+      <div class="recent-list">
+        {all.slice(0, 5).map((p) => (
+          <a class="recent-item" href={`/posts/${p.id}/`}>
+            <div class="recent-main">
+              <span class="recent-title">{p.data.title}</span>
+              <span class={`tag-chip cat-${p.data.category}`}>{p.data.category}</span>
+              <p class="recent-desc">{p.data.description}</p>
+            </div>
+            <time>{fmt(p.data.date)}</time>
+          </a>
+        ))}
+      </div>
+    </section>
+    <aside class="now-panel" aria-label="现在状态">
+      <h2 class="now-title">现在</h2>
+      <div class="now-row">
+        <span class="now-label">正在学习</span>
+        <span class="now-value">{siteConfig.now.learning}</span>
+      </div>
+      <div class="now-row">
+        <span class="now-label">正在研究</span>
+        <span class="now-value">{siteConfig.now.researching}</span>
+      </div>
+      <div class="now-row">
+        <span class="now-label">正在阅读</span>
+        <span class="now-value">{siteConfig.now.reading.map((r) => <span>{r}</span>)}</span>
+      </div>
+      <div class="now-row">
+        <span class="now-label">最近在思考</span>
+        <span class="now-value">{siteConfig.now.thinking}</span>
+      </div>
+      <p class="now-updated">最后更新：{siteConfig.now.updated}</p>
+    </aside>
   </div>
-
-  <script>
-    const input = document.getElementById('search-input');
-    const chips = Array.from(document.querySelectorAll('.chip[data-cat]'));
-    const cards = Array.from(document.querySelectorAll('.post-card'));
-    const listTitle = document.getElementById('list-title');
-    const listCount = document.getElementById('list-count');
-    const emptyBox = document.getElementById('empty-state');
-    let cat = '全部';
-
-    function apply() {
-      const q = input ? input.value.trim().toLowerCase() : '';
-      let shown = 0;
-      cards.forEach((c) => {
-        const okCat = cat === '全部' || c.dataset.cat === cat;
-        const okQ = !q || (c.dataset.search || '').includes(q);
-        const ok = okCat && okQ;
-        c.hidden = !ok;
-        if (ok) shown++;
-      });
-      listCount.textContent = q ? `找到 ${shown} 篇，关键词“${input.value.trim()}”` : `共 ${shown} 篇`;
-      listTitle.textContent = cat === '全部' ? (q ? '搜索结果' : '全部文章') : `栏目 · ${cat}`;
-      if (emptyBox) emptyBox.hidden = shown > 0;
-    }
-
-    chips.forEach((b) =>
-      b.addEventListener('click', () => {
-        cat = b.dataset.cat;
-        chips.forEach((x) => x.classList.toggle('active', x === b));
-        apply();
-      })
-    );
-    if (input) input.addEventListener('input', apply);
-    apply();
-  </script>
 </BaseLayout>

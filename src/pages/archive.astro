@@ -1,13 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { siteConfig } from '../site.config';
 
 const all = (await getCollection('posts'))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+const cat = Astro.url.searchParams.get('cat') || '';
+const list = cat ? all.filter((p) => p.data.category === cat) : all;
+
 const byYear = {};
-for (const p of all) {
+for (const p of list) {
   const y = String(p.data.date.getFullYear());
   (byYear[y] = byYear[y] || []).push(p);
 }
@@ -19,12 +23,26 @@ function fmt(d) {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 ---
-<BaseLayout title="归档">
+<BaseLayout title={cat ? `栏目 · ${cat}` : '归档'}>
   <section class="page">
     <div class="page-head">
-      <h1>归档</h1>
-      <p>按时间倒序排列的全部文章，共 {all.length} 篇。</p>
+      <h1>{cat ? `栏目 · ${cat}` : '归档'}</h1>
+      <p>按时间倒序排列的全部文章，共 {list.length} 篇。</p>
     </div>
+
+    <div class="archive-chips">
+      <a class="chip" class:list={[{ active: !cat }]} href="/archive/">全部</a>
+      {siteConfig.categories.map((c) => (
+        <a
+          class="chip"
+          class:list={[{ active: cat === c.name }]}
+          href={`/archive/?cat=${encodeURIComponent(c.name)}`}
+        >
+          {c.name}
+        </a>
+      ))}
+    </div>
+
     {years.map((y) => (
       <div class="archive-group">
         <h2>{y} 年 <span class="n">{byYear[y].length} 篇</span></h2>
@@ -33,7 +51,7 @@ function fmt(d) {
             <a class="archive-item" href={`/posts/${p.id}/`}>
               <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
               <span class="t">{p.data.title}</span>
-              <span class="tag-chip cat-{p.data.category}">{p.data.category}</span>
+              <span class={`tag-chip cat-${p.data.category}`}>{p.data.category}</span>
             </a>
           ))}
         </div>

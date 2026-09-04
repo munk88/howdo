@@ -14,11 +14,11 @@ const dateStr = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.get
 const searchText = `${title} ${description} ${category} ${tags.join(' ')}`.toLowerCase();
 ---
 <article class="post-card" data-cat={category} data-search={searchText}>
-  <div class="post-card__spine cat-{category}"></div>
+  <div class={`post-card__spine cat-${category}`}></div>
   <a class="post-card__link" href={`/posts/${slug}/`}>
     <div class="post-card__body">
       <div class="post-card__meta">
-        <span class="tag-chip cat-{category}">{category}</span>
+        <span class={`tag-chip cat-${category}`}>{category}</span>
         <time datetime={date.toISOString()}>{dateStr}</time>
         <span>{minutes} 分钟</span>
       </div>
