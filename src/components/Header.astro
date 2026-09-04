@@ -15,7 +15,7 @@ const isAbout = path === '/about/';
       <a href="/" class:list={[{ active: isHome }]}>首页</a>
       {siteConfig.categories.map((c) => (
         <a
-          href={`/archive/?cat=${encodeURIComponent(c.name)}`}
+          href={`/category/${encodeURIComponent(c.name)}/`}
           class:list={[{ active: cat === c.name }]}
         >
           {c.name}

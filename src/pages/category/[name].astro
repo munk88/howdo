@@ -1,10 +1,16 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { siteConfig } from '../site.config';
+import { siteConfig } from '../../site.config';
 
+// 为三大栏目各生成一个独立页面：/category/技术实践/ 等
+export function getStaticPaths() {
+  return siteConfig.categories.map((c) => ({ params: { name: c.name }, props: { cat: c } }));
+}
+
+const { cat } = Astro.props;
 const all = (await getCollection('posts'))
-  .filter((p) => !p.data.draft)
+  .filter((p) => !p.data.draft && p.data.category === cat.name)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const byYear = {};
@@ -20,20 +26,21 @@ function fmt(d) {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 ---
-<BaseLayout
-  title="归档"
-  description={'按时间倒序排列的全部文章，共 ' + all.length + ' 篇。'}
->
+<BaseLayout title={`栏目 · ${cat.name}`} description={cat.desc}>
   <section class="page">
     <div class="page-head">
-      <h1>归档</h1>
-      <p>按时间倒序排列的全部文章，共 {all.length} 篇。</p>
+      <h1>{cat.name}</h1>
+      <p>{cat.desc} 共 {all.length} 篇。</p>
     </div>
 
     <div class="archive-chips">
-      <a class="chip active" href="/archive/">全部</a>
+      <a class="chip" href="/archive/">全部</a>
       {siteConfig.categories.map((c) => (
-        <a class="chip" href={`/category/${encodeURIComponent(c.name)}/`}>
+        <a
+          class="chip"
+          class:list={[{ active: c.name === cat.name }]}
+          href={`/category/${encodeURIComponent(c.name)}/`}
+        >
           {c.name}
         </a>
       ))}
