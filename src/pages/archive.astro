@@ -9,6 +9,7 @@ const all = (await getCollection('posts'))
 
 const cat = Astro.url.searchParams.get('cat') || '';
 const list = cat ? all.filter((p) => p.data.category === cat) : all;
+const catDesc = cat ? siteConfig.categories.find((c) => c.name === cat)?.desc : undefined;
 
 const byYear = {};
 for (const p of list) {
@@ -23,7 +24,10 @@ function fmt(d) {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 ---
-<BaseLayout title={cat ? `栏目 · ${cat}` : '归档'}>
+<BaseLayout
+  title={cat ? `栏目 · ${cat}` : '归档'}
+  description={catDesc ?? '按时间倒序排列的全部文章，共 ' + list.length + ' 篇。'}
+>
   <section class="page">
     <div class="page-head">
       <h1>{cat ? `栏目 · ${cat}` : '归档'}</h1>

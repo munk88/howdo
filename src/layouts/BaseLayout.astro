@@ -12,6 +12,8 @@ interface Props {
 const { title, description } = Astro.props;
 const pageTitle = title ? `${title} · ${siteConfig.name}` : `${siteConfig.name} · ${siteConfig.tagline}`;
 const pageDesc = description ?? siteConfig.tagline;
+// canonical：统一指向当前页面的无查询参数 URL，避免栏目筛选等带参地址造成重复内容
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://howdo.icu').href;
 
 // 全局搜索索引（注入到每个页面，供搜索遮罩使用）
 const searchIndex = (await getCollection('posts'))
@@ -32,6 +34,7 @@ const searchIndex = (await getCollection('posts'))
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link
       rel="stylesheet"

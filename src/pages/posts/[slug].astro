@@ -11,6 +11,8 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const d = post.data.date;
 const dateStr = `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+const u = post.data.updated;
+const updatedStr = u ? `${u.getFullYear()} 年 ${u.getMonth() + 1} 月 ${u.getDate()} 日` : null;
 const minutes = Math.max(1, Math.round((post.body || '').replace(/\s/g, '').length / 400));
 
 const all = (await getCollection('posts'))
@@ -30,7 +32,8 @@ const next = idx > 0 ? all[idx - 1] : null;
     <header class="article-head">
       <div class="post-card__meta">
         <span class={`tag-chip cat-${post.data.category}`}>{post.data.category}</span>
-        <time datetime={post.data.date.toISOString()}>{dateStr}</time>
+        <time datetime={post.data.date.toISOString()}>发布于 {dateStr}</time>
+        {updatedStr && <time datetime={u.toISOString()}>更新于 {updatedStr}</time>}
         <span>{minutes} 分钟</span>
       </div>
       <h1>{post.data.title}</h1>
