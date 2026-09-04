@@ -19,6 +19,31 @@
     });
   }
 
+  // 移动端汉堡菜单
+  var navToggle = document.getElementById('nav-toggle');
+  var nav = document.getElementById('site-nav');
+  function closeNav() {
+    if (nav) nav.classList.remove('open');
+    if (navToggle) navToggle.setAttribute('aria-expanded', 'false');
+  }
+  if (navToggle && nav) {
+    navToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = nav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target.closest('a')) closeNav();
+    });
+  }
+  document.addEventListener('click', function (e) {
+    if (!nav || !nav.classList.contains('open')) return;
+    if (!e.target.closest('.site-header')) closeNav();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && nav && nav.classList.contains('open')) closeNav();
+  });
+
   // 全局搜索遮罩
   var overlay = document.getElementById('search-overlay');
   var openBtn = document.getElementById('search-open');

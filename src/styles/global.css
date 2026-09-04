@@ -77,7 +77,7 @@ ul { list-style: none; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 16px; }
 .brand { display: flex; align-items: center; min-width: 0; }
 .brand__name { font-family: var(--font-serif); font-weight: 700; font-size: 17px; letter-spacing: .05em; white-space: nowrap; }
-.nav { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.nav { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin-left: auto; }
 .nav::-webkit-scrollbar { display: none; }
 .nav a {
   flex: none; padding: 8px 12px; border-radius: 8px;
@@ -86,6 +86,7 @@ ul { list-style: none; }
 }
 .nav a:hover { background: var(--accent-soft); color: var(--ink); }
 .nav a.active { color: var(--ink); font-weight: 600; background: var(--accent-soft); }
+.header-actions { display: flex; align-items: center; gap: 4px; }
 .icon-btn {
   flex: none; width: 36px; height: 36px; border-radius: 8px; border: 1px solid transparent;
   background: transparent; color: var(--ink-2);
@@ -94,6 +95,7 @@ ul { list-style: none; }
 }
 .icon-btn:hover { background: var(--accent-soft); color: var(--ink); }
 .icon-btn svg { width: 18px; height: 18px; }
+.nav-toggle { display: none; }
 
 /* 阅读进度 */
 .read-progress {
@@ -405,6 +407,19 @@ ul { list-style: none; }
 
 /* ============ 响应式 ============ */
 @media (max-width: 860px) {
+  .nav-toggle { display: grid; }
+  .nav {
+    position: absolute; top: calc(100% + 1px); left: 0; right: 0;
+    margin-left: 0; overflow: visible;
+    flex-direction: column; align-items: stretch; gap: 2px;
+    background: var(--paper); border-bottom: 1px solid var(--line);
+    box-shadow: 0 24px 44px -28px rgba(0, 0, 0, .38);
+    padding: 10px 20px 16px;
+    display: none;
+  }
+  .nav.open { display: flex; }
+  .nav a { padding: 13px 8px; font-size: 15.5px; }
+  .nav a.active { background: var(--accent-soft); }
   .hero-split { grid-template-columns: 1fr; gap: 34px; padding-top: 36px; }
   .theme-grid { grid-template-columns: repeat(2, 1fr); row-gap: 20px; }
   .featured-grid { grid-template-columns: 1fr; }
