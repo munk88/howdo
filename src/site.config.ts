@@ -32,7 +32,7 @@ export const siteConfig = {
   ],
 
   // 首页「从这里开始」推荐的三篇文章（填 src/content/posts/ 下的文件名）
-  featured: ['static-blog', 'zettelkasten', 'walden'],
+  featured: ['static-blog', 'zettelkasten', '我为什么要写博客'],
 
   // 侧边栏「现在」状态（改成你真实的状态即可）
   now: {
