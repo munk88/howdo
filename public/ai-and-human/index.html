@@ -105,6 +105,41 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
 @media(max-width:760px){
   .g2,.g3,.g4{grid-template-columns:1fr}
   section{padding:30px 0}
+
+  /* 导航：单行横向滑动，避免在手机上换行挤压成多行 */
+  nav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 0;gap:4px}
+  nav::-webkit-scrollbar{display:none}
+  nav a{flex:none;padding:8px 12px;font-size:14px;white-space:nowrap}
+  .nav-brand{flex:none;margin-right:8px;font-size:14px}
+
+  /* 标题区允许换行，说明文字不再挤压 */
+  .sec-head{flex-wrap:wrap;gap:6px 14px}
+
+  /* hero 在手机上收紧内边距 */
+  .hero .wrap{padding:40px 20px 32px}
+
+  /* 卡片、表格在手机上更紧凑（表格仍横向可滚） */
+  .card{padding:18px}
+  table,th,td{font-size:13px}
+  th,td{padding:8px 10px}
+  caption{font-size:12px;padding:8px 12px}
+  .quote{padding:12px 14px}
+  .note{padding:10px 12px;font-size:13px}
+  .lead{font-size:14px;padding:12px 14px}
+
+  /* 落地模板三块在手机上占满整行 */
+  .card [style*="min-width:240px"]{min-width:100%;flex-basis:100%}
+}
+@media(max-width:480px){
+  .hero h1{font-size:28px}
+  .eyebrow{font-size:11px}
+  .chips span{font-size:11px;padding:4px 10px}
+  .hero .meta{font-size:12px}
+  .sec-head h2{font-size:20px}
+  .flow-step h4{font-size:14px}
+  .flow-step p{font-size:13px}
+  ul.tight li{font-size:13px}
+  footer{font-size:12px}
 }
 @media print{
   header{position:static}
