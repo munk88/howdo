@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>借 AI 升级自己：人和 AI 融合的五习惯 — 深度解析</title>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --bg-soft:#eaf0fa;
+  --ink:#16213a;
+  --muted:#5c6a85;
+  --line:#dce4f0;
+  --card:#ffffff;
+  --blue:#3b6cf6;
+  --teal:#10b5a0;
+  --violet:#8b5cf6;
+  --amber:#f59e0b;
+  --rose:#ec4899;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(22,33,58,.06),0 8px 24px rgba(22,33,58,.07);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.7;overflow-wrap:break-word}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+h1,h2,h3,h4{line-height:1.3;margin:0 0 .5em}
+p{margin:0 0 1em}
+a{color:var(--blue)}
+section{padding:44px 0}
+.sv-block{overflow-x:auto}
+
+/* ---------- header / hero ---------- */
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px 0}
+.nav-brand{font-weight:800;color:var(--blue);margin-right:8px}
+nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:20px}
+nav a:hover{background:var(--bg-soft);color:var(--blue)}
+.hero{background:linear-gradient(135deg,#16213a 0%,#24365c 55%,#3b6cf6 130%);color:#fff;border-bottom:1px solid var(--line)}
+.hero .wrap{padding:52px 20px 40px}
+.eyebrow{display:inline-block;font-size:12px;letter-spacing:.14em;color:#9cb4ef;margin-bottom:14px;font-weight:700}
+.hero h1{font-size:clamp(28px,4.6vw,46px);font-weight:800;color:#fff}
+.hero .sub{color:#c6d3ee;max-width:720px;font-size:clamp(15px,2vw,18px);margin-top:12px}
+.hero .meta{margin-top:18px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#9cb4ef}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chips span{font-size:12px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.12);color:#e7eefb;border:1px solid rgba(255,255,255,.2)}
+
+/* ---------- generic card / blocks ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px}
+.sec-num{font-size:13px;font-weight:800;letter-spacing:.08em;color:#93a3bd}
+.sec-head h2{font-size:clamp(22px,3vw,30px);font-weight:800}
+.sec-head .hint{color:var(--muted);font-size:14px}
+.tint-blue{border-top:4px solid var(--blue)}
+.tint-teal{border-top:4px solid var(--teal)}
+.tint-violet{border-top:4px solid var(--violet)}
+.tint-amber{border-top:4px solid var(--amber)}
+.tint-rose{border-top:4px solid var(--rose)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:20px}
+.tag-blue{background:#e7edff;color:var(--blue)}
+.tag-teal{background:#e0f7f2;color:#0a8f7c}
+.tag-violet{background:#f0eafe;color:#6f3fe0}
+.tag-amber{background:#fef3e0;color:#b97706}
+.tag-rose{background:#fdeaf3;color:#d6336c}
+.lead{background:rgba(255,255,255,.6);border:1px dashed var(--line);border-radius:12px;padding:14px 18px;color:var(--muted);font-size:15px;margin-bottom:18px}
+.lead b{color:var(--ink)}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:14px}
+caption{font-size:13px;color:var(--muted);padding:10px 12px;text-align:left;background:var(--bg-soft);border-bottom:1px solid var(--line)}
+th{background:var(--bg-soft);text-align:left;font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .dim{color:var(--muted);font-size:13px}
+
+/* ---------- pill / step / list ---------- */
+.pill{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;color:#fff;font-weight:800;flex:none;font-size:14px}
+.b0{background:var(--blue)}.b1{background:var(--teal)}.b2{background:var(--violet)}.b3{background:var(--amber)}.b4{background:var(--rose)}
+.flow{display:flex;flex-direction:column;gap:10px}
+.flow-step{display:flex;gap:12px;align-items:flex-start}
+.flow-step .body{flex:1}
+.flow-step h4{margin:2px 0 2px;font-size:15px}
+.flow-step p{margin:0;color:var(--muted);font-size:13.5px}
+ul.tight{padding-left:20px;margin:6px 0 0}
+ul.tight li{margin-bottom:6px;font-size:14px}
+.keyline{border-left:3px solid var(--blue);padding:2px 0 2px 12px;margin:6px 0 12px}
+.quote{border-left:4px solid var(--amber);background:var(--bg-soft);padding:14px 18px;border-radius:0 12px 12px 0;color:var(--ink);font-weight:600;font-style:italic;margin:18px 0}
+.quote small{display:block;margin-top:6px;font-weight:400;color:var(--muted);font-style:normal}
+
+/* ---------- callout ---------- */
+.note{display:flex;gap:10px;background:#eef4ff;border:1px solid #cfdcff;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#1f3a8c;margin-top:12px}
+.note.warn{background:#fff7ea;border-color:#f7ddb0;color:#8a5b0a}
+.note .lbl{font-weight:800;flex:none}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink);color:#c6d3ee;padding:26px 0;font-size:13px;margin-top:30px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#93a3bd}
+
+@media(max-width:760px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  section{padding:30px 0}
+}
+@media print{
+  header{position:static}
+  body{background:#fff}
+  .card{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav aria-label="章节导航">
+      <span class="nav-brand">借 AI 升级自己</span>
+      <a href="#map">主线</a>
+      <a href="#tech">技术底座</a>
+      <a href="#h1">①持续输入</a>
+      <a href="#h2">②建立闭环</a>
+      <a href="#h3">③模拟训练</a>
+      <a href="#h4">④先用起来</a>
+      <a href="#h5">⑤主动分享</a>
+      <a href="#system">系统关系</a>
+      <a href="#action">启动清单</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" style="padding:0">
+  <div class="wrap">
+    <span class="eyebrow">人和 AI 的融合哲学 · 深度解析</span>
+    <h1>借 AI，升级自己</h1>
+    <p class="sub">这不是一份「AI 工具说明书」，而是一套与人机协作有关的<strong style="color:#fff">学习方法论</strong>。它把 AI 的底层原理（Transformer、扩散模型）翻译成普通人每天可用的五个习惯，让你的经验成为判断，让 AI 成为推演与执行的杠杆。</p>
+    <div class="chips">
+      <span>5 个使用习惯</span>
+      <span>2 项技术底座</span>
+      <span>1 个闭环系统</span>
+      <span>1 份启动清单</span>
+    </div>
+    <p class="meta">素材来源：讲师课件《AI 的发展历史与人和 AI 的融合哲学》· 已按逻辑层次梳理与扩写</p>
+  </div>
+</section>
+
+<main class="wrap" style="padding:0">
+
+<!-- ============ 0. 主线 ============ -->
+<section id="map">
+  <div class="sec-head">
+    <span class="sec-num">概论</span>
+    <h2>先用一张图看懂：五个习惯是一套「升级系统」</h2>
+  </div>
+  <p class="lead">五个习惯不是并列的五个技巧，而是环环相扣的一条成长路径：<b>先把你的材料喂进去（输入）→ 让行动的成果回流成新经验（闭环）→ 在高风险场景先演练一遍（模拟）→ 让思维和能力先跑起来（先手）→ 再通过分享把方法放大（扩散）</b>。越往后，你能调用和沉淀的东西越多。</p>
+
+  <div class="card">
+    <div class="sv-block">
+    <svg viewBox="0 0 1000 210" role="img" aria-label="五个习惯的主线流程：输入、闭环、模拟、先手、扩散" style="width:100%;min-width:720px;height:auto">
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#93a3bd"/></marker>
+      </defs>
+      <g font-family="inherit">
+        <!-- 5 boxes -->
+        <!-- h1 -->
+        <rect x="30" y="55" width="150" height="86" rx="14" fill="#e7edff" stroke="#3b6cf6"/>
+        <rect x="30" y="55" width="150" height="26" rx="14" fill="#3b6cf6"/><text x="105" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">01 持续输入</text>
+        <text x="105" y="100" text-anchor="middle" font-size="12" fill="#1f3a8c" font-weight="700">让 AI 获得</text>
+        <text x="105" y="118" text-anchor="middle" font-size="12" fill="#1f3a8c">理解你的材料</text>
+        <!-- arrow -->
+        <line x1="182" y1="98" x2="218" y2="98" stroke="#93a3bd" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- h2 -->
+        <rect x="220" y="55" width="150" height="86" rx="14" fill="#e0f7f2" stroke="#10b5a0"/>
+        <rect x="220" y="55" width="150" height="26" rx="14" fill="#10b5a0"/><text x="295" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">02 建立闭环</text>
+        <text x="295" y="100" text-anchor="middle" font-size="12" fill="#0a6d5e" font-weight="700">每次行动产生</text>
+        <text x="295" y="118" text-anchor="middle" font-size="12" fill="#0a6d5e">新的经验</text>
+        <line x1="372" y1="98" x2="408" y2="98" stroke="#93a3bd" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- h3 -->
+        <rect x="410" y="55" width="150" height="86" rx="14" fill="#f0eafe" stroke="#8b5cf6"/>
+        <rect x="410" y="55" width="150" height="26" rx="14" fill="#8b5cf6"/><text x="485" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">03 模拟训练</text>
+        <text x="485" y="100" text-anchor="middle" font-size="12" fill="#5b2bd0" font-weight="700">重要场景先</text>
+        <text x="485" y="118" text-anchor="middle" font-size="12" fill="#5b2bd0">发生一次</text>
+        <line x1="562" y1="98" x2="598" y2="98" stroke="#93a3bd" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- h4 -->
+        <rect x="600" y="55" width="150" height="86" rx="14" fill="#fef3e0" stroke="#f59e0b"/>
+        <rect x="600" y="55" width="150" height="26" rx="14" fill="#f59e0b"/><text x="675" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">04 先用起来</text>
+        <text x="675" y="100" text-anchor="middle" font-size="12" fill="#9a6b06" font-weight="700">思维走在</text>
+        <text x="675" y="118" text-anchor="middle" font-size="12" fill="#9a6b06">工具前面</text>
+        <line x1="752" y1="98" x2="788" y2="98" stroke="#93a3bd" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- h5 -->
+        <rect x="790" y="55" width="150" height="86" rx="14" fill="#fdeaf3" stroke="#ec4899"/>
+        <rect x="790" y="55" width="150" height="26" rx="14" fill="#ec4899"/><text x="865" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">05 主动分享</text>
+        <text x="865" y="100" text-anchor="middle" font-size="12" fill="#b81863" font-weight="700">方法成为</text>
+        <text x="865" y="118" text-anchor="middle" font-size="12" fill="#b81863">别人的能力</text>
+        <!-- bottom labels -->
+        <text x="105" y="172" text-anchor="middle" font-size="11" fill="#93a3bd">让 AI 有据可依</text>
+        <text x="295" y="172" text-anchor="middle" font-size="11" fill="#93a3bd">经验 → 行动 → 回流</text>
+        <text x="485" y="172" text-anchor="middle" font-size="11" fill="#93a3bd">低成本试错</text>
+        <text x="675" y="172" text-anchor="middle" font-size="11" fill="#93a3bd">判断须先于工具</text>
+        <text x="865" y="172" text-anchor="middle" font-size="11" fill="#93a3bd">方法与网络扩散</text>
+        <!-- feedback arc -->
+        <path d="M 940 178 C 950 205, 60 205, 40 178" fill="none" stroke="#dce4f0" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="500" y="202" text-anchor="middle" font-size="11" fill="#93a3bd">分享带来的新案例与反馈，反向滋养「输入」与「闭环」——这是一个自我增强的循环</text>
+      </g>
+    </svg>
+    </div>
+  </div>
+  <div class="note"><span class="lbl">一句话主线</span>你提供经验与判断，AI 帮你整理和推演，再一起把事情推进——五习惯就是这条主线的落地动作。</div>
+</section>
+
+<!-- ============ 1. 技术底座 ============ -->
+<section id="tech">
+  <div class="sec-head">
+    <span class="sec-num">基础</span>
+    <h2>技术底座：AI 到底是怎么「工作」的</h2>
+    <span class="hint">理解原理，才知道习惯为什么重要</span>
+  </div>
+  <div class="grid g2">
+    <div class="card tint-blue">
+      <span class="tag tag-blue">习惯的理解支撑 · Transformer · 2017《Attention Is All You Need》</span>
+      <h3 style="margin-top:10px">Transformer：用上下文理解词语</h3>
+      <p style="color:var(--muted);font-size:14px">同一个词，孤零零看会歧义；放进完整句子里，线索自动消解歧义。<strong>Attention（注意力）</strong>计算各部分的关联程度，按不同权重组合上下文信息。</p>
+      <div class="sv-block">
+      <svg viewBox="0 0 560 150" role="img" aria-label="bank 一词在两种上下文中的不同含义" style="width:100%;min-width:520px;height:auto">
+        <g font-size="12">
+          <rect x="10" y="10" width="250" height="60" rx="10" fill="#e7edff" stroke="#3b6cf6"/>
+          <text x="20" y="32" fill="#1f3a8c" font-weight="700">He deposited money at the bank.</text>
+          <text x="20" y="52" fill="#5c6a85">线索：money（钱）</text>
+          <rect x="270" y="22" width="40" height="34" rx="8" fill="#3b6cf6"/><text x="290" y="44" text-anchor="middle" fill="#fff" font-weight="800">银行</text>
+          <rect x="10" y="80" width="250" height="60" rx="10" fill="#e0f7f2" stroke="#10b5a0"/>
+          <text x="20" y="102" fill="#0a6d5e" font-weight="700">He sat on the bank of the river.</text>
+          <text x="20" y="122" fill="#5c6a85">线索：river（河流）</text>
+          <rect x="270" y="92" width="40" height="34" rx="8" fill="#10b5a0"/><text x="290" y="114" text-anchor="middle" fill="#fff" font-weight="800">河岸</text>
+          <text x="450" y="60" text-anchor="middle" font-size="11" fill="#93a3bd">完整句子 + 相关线索</text>
+          <text x="450" y="76" text-anchor="middle" font-size="11" fill="#93a3bd">→ 定位正确含义</text>
+          <line x1="330" y1="40" x2="345" y2="40" stroke="#5c6a85" stroke-width="2" stroke-dasharray="3 3"/>
+          <line x1="330" y1="110" x2="345" y2="110" stroke="#5c6a85" stroke-width="2" stroke-dasharray="3 3"/>
+        </g>
+      </svg>
+      </div>
+      <p style="color:var(--muted);font-size:13.5px"><strong>给你的启示：</strong>AI 判断对错，取决于你有没有给它足够的「上下文线索」。材料给得越足，它越不容易把「bank」理解成「银行」。</p>
+    </div>
+
+    <div class="card tint-teal">
+      <span class="tag tag-teal">习惯的生成支撑 · Diffusion · 2020 DDPM</span>
+      <h3 style="margin-top:10px">扩散模型：用「加噪练习」学会「去噪」</h3>
+      <p style="color:var(--muted);font-size:14px">训练时分两步：给一张图<strong>逐步加噪</strong>直到面目全非；让模型<strong>看带噪的图、预测加入的噪声</strong>，并与真实噪声对照修正，反复学习。</p>
+      <div class="sv-block">
+      <svg viewBox="0 0 560 150" role="img" aria-label="扩散模型从随机噪声逐步去噪生成图像" style="width:100%;min-width:520px;height:auto">
+        <g text-anchor="middle" font-size="11">
+          <text x="55" y="20" fill="#0a6d5e" font-weight="700">训练：加噪 → 学去噪</text>
+          <rect x="15" y="30" width="45" height="45" rx="8" fill="#cbd5e1" stroke="#94a3b8"/>
+          <text x="37" y="70" fill="#5c6a85">清晰图</text>
+          <line x1="60" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+          <defs><marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+          <rect x="82" y="30" width="45" height="45" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+          <text x="104" y="70" fill="#5c6a85">加噪中</text>
+          <line x1="127" y1="50" x2="147" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+          <rect x="149" y="30" width="45" height="45" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+          <text x="171" y="70" fill="#5c6a85">噪声图</text>
+          <line x1="194" y1="50" x2="210" y2="50" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="238" y="70" fill="#0a8f7c">预测噪声 + 对照修正</text>
+
+          <text x="395" y="20" fill="#0a6d5e" font-weight="700">生成：随机噪声 → 逐步去噪</text>
+          <rect x="300" y="30" width="45" height="45" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+          <text x="322" y="70" fill="#5c6a85">噪声</text>
+          <line x1="345" y1="50" x2="365" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+          <rect x="367" y="30" width="45" height="45" rx="8" fill="#dbeafe" stroke="#60a5fa"/>
+          <text x="389" y="70" fill="#5c6a85">去噪</text>
+          <line x1="412" y1="50" x2="432" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+          <rect x="434" y="30" width="45" height="45" rx="8" fill="#cbd5e1" stroke="#3b6cf6"/>
+          <text x="456" y="70" fill="#5c6a85">成形</text>
+          <line x1="479" y1="50" x2="495" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+          <text x="515" y="62" fill="#93a3bd">清晰</text>
+          <text x="515" y="76" fill="#93a3bd">新图</text>
+          <text x="385" y="110" font-size="11" fill="#93a3bd">每一步预测噪声并更新图像，轮廓细节逐渐清楚；文生图时文字要求参与去噪控制画面</text>
+        </g>
+      </svg>
+      </div>
+      <p style="color:var(--muted);font-size:13.5px"><strong>给你的启示：</strong>好结果从来不是一步到位的，是靠「明确标准 + 反复修正」从噪声里长出来的——这正是「建立闭环」的模型基础。</p>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:2px">
+    <div class="card">
+      <h3>Transformer 处理一段话的四个步骤</h3>
+      <div class="flow">
+        <div class="flow-step"><span class="pill b0">1</span><div class="body"><h4>拆分文字</h4><p>把文字变成可计算的信息，并保留先后位置。</p></div></div>
+        <div class="flow-step"><span class="pill b0">2</span><div class="body"><h4>联系上下文</h4><p>计算可见内容之间的关联，组合相关线索。</p></div></div>
+        <div class="flow-step"><span class="pill b0">3</span><div class="body"><h4>反复加工</h4><p>经过多层处理，形成结合上下文的信息。</p></div></div>
+        <div class="flow-step"><span class="pill b0">4</span><div class="body"><h4>生成回答</h4><p>结合输入与已写出的内容，逐个生成后续文字片段。</p></div></div>
+      </div>
+      <div class="note"><span class="lbl">这一步的意义</span>许多训练计算可同时进行，也更容易联系相隔较远的内容。</div>
+    </div>
+    <div class="card">
+      <h3>技术 → 习惯的映射</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>技术原理</th><th>翻译成习惯</th><th>支撑哪个习惯</th></tr></thead>
+        <tbody>
+          <tr><td>用上下文理解（Transformer）</td><td>给足材料 → AI 才理解得到位</td><td><span class="tag tag-blue">① 持续输入</span></td></tr>
+          <tr><td>加噪→去噪、对照修正（Diffusion）</td><td>好样本给标准，结果回流成新经验</td><td><span class="tag tag-teal">② 建立闭环</span></td></tr>
+          <tr><td>模拟数据创造练习材料（Diffusion）</td><td>模拟场景为人创造练习机会</td><td><span class="tag tag-violet">③ 模拟训练</span></td></tr>
+          <tr><td>把任务拆解成可计算步骤</td><td>先建思维，工具更新才有处可落</td><td><span class="tag tag-amber">④ 先用起来</span></td></tr>
+          <tr><td>扩散传播、一路放大</td><td>方法被采用、被验证、再被传播</td><td><span class="tag tag-rose">⑤ 主动分享</span></td></tr>
+        </tbody>
+      </table></div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:10px">每个习惯背后都站着一个可解释的机制——这不是「感觉有用」，而是「原理使然」。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 习惯一 ============ -->
+<section id="h1">
+  <div class="sec-head"><span class="sec-num">习惯 01</span><h2>持续输入：让 AI 获得理解你的材料</h2></div>
+  <p class="lead">核心不是「多喂」，而是<b>「喂对」</b>。给 AI 的每一句问题背后，都藏着它无法猜测的背景——上下文决定了理解质量。</p>
+
+  <div class="grid g2">
+    <div class="card tint-blue">
+      <span class="tag tag-blue">从哪里入手</span>
+      <h3 style="margin-top:8px">「帮我写一份汇报」——这句话还缺什么？</h3>
+      <ul class="tight" style="margin-top:8px">
+        <li><strong>汇报给谁？</strong>对方正在关心什么、用什么语气沟通。</li>
+        <li><strong>最近发生了什么？</strong>你已经做过哪些事、推进到哪一步。</li>
+        <li><strong>你的目标？</strong>是让对方了解情况，还是作出一个决定。</li>
+        <li><strong>约束条件？</strong>场合、时长、材料用途、期望的口径。</li>
+      </ul>
+      <div class="note"><span class="lbl">本质</span>持续提供相关材料，让 AI 在这次任务中有据可依——它才能像人拿到完整档案一样作答。</div>
+    </div>
+
+    <div class="card tint-blue">
+      <span class="tag tag-blue">四类材料</span>
+      <h3 style="margin-top:8px">把散落信息整理成下一次能用的资料</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>材料来源</th><th>可以留下什么</th><th>帮助 AI 理解什么</th></tr></thead>
+        <tbody>
+          <tr><td>自己的工作</td><td>日报、会议、项目记录</td><td>发生了什么，推进到了哪里</td></tr>
+          <tr><td>他人的反馈</td><td>领导意见、客户原话</td><td>对方在意什么，哪里需要调整</td></tr>
+          <tr><td>学习的收获</td><td>书籍笔记、课程与案例</td><td>有哪些方法，适用于什么场景</td></tr>
+          <tr><td>任务的背景</td><td>目标、对象、期限与资源</td><td>这一次怎样才算把事情做好</td></tr>
+        </tbody>
+      </table></div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:8px">持续整理到<strong>同一个项目</strong>里，任务需要时就让它读取。缺信息时，先请 AI 把缺失项列出来，你再补。</p>
+    </div>
+  </div>
+
+  <div class="card tint-blue" style="margin-top:2px">
+    <h3>落地模板：带着材料交任务</h3>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:14px">
+      <div style="flex:1;min-width:240px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:var(--blue);margin-bottom:6px">✅ 你先准备</div>
+        <ul class="tight"><li>本周日报与项目进展</li><li>领导最近提出的关注点</li><li>这次汇报希望促成的决定</li></ul>
+      </div>
+      <div style="flex:1;min-width:240px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:var(--blue);margin-bottom:6px">🧩 你可以这样问</div>
+        <p style="font-size:13.5px;margin:0">「这是本周日报、项目进展和领导反馈。我要在周会上做 3 分钟汇报，争取对方对下一步安排作决定。请先整理关键事实和缺失信息，再分析重点，最后给出汇报建议。」</p>
+      </div>
+      <div style="flex:1;min-width:240px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:var(--blue);margin-bottom:6px">🔄 反馈闭环</div>
+        <p style="font-size:13.5px;margin:0">材料给足 → 答案有依据；材料不足 → 请 AI 主动列出缺失项，继续补充。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 习惯二 ============ -->
+<section id="h2">
+  <div class="sec-head"><span class="sec-num">习惯 02</span><h2>建立闭环：让每次行动产生新的经验</h2></div>
+  <p class="lead">闭环的四要素：<b>经验、好样本、真实输入、结果回流</b>。扩散模型告诉我们要靠「明确标准 + 反复修正」，闭环就是把这件事搬到你的日常工作中。</p>
+
+  <div class="grid g2">
+    <div class="card tint-teal">
+      <h3>让「好结果的样子」先交代清楚</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>输入</th><th>以会议纪要为例</th></tr></thead>
+        <tbody>
+          <tr><td>个人经验</td><td>以往哪里容易遗漏，领导和同事最在意什么</td></tr>
+          <tr><td>优秀样本</td><td>一份被认可的纪要，以及它好在哪里</td></tr>
+          <tr><td>本次材料</td><td>这次录音、参会者，以及纪要的用途</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><span class="lbl">没有好样本时</span>先让 AI 搜索可靠范例，再选适合自己任务的做法。</div>
+    </div>
+
+    <div class="card tint-teal">
+      <h3>AI 的工作顺序：先总结，再分析，后建议</h3>
+      <div class="flow">
+        <div class="flow-step"><span class="pill b1">1</span><div class="body"><h4>总结</h4><p>发生了什么？哪些信息还没说清楚？（先立事实依据）</p></div></div>
+        <div class="flow-step"><span class="pill b1">2</span><div class="body"><h4>分析</h4><p>为什么可能这样？接下来可能发生什么？（推演原因与走向）</p></div></div>
+        <div class="flow-step"><span class="pill b1">3</span><div class="body"><h4>建议</h4><p>结合目标和现实条件，下一步怎么做？（给出行动）</p></div></div>
+      </div>
+      <div class="note"><span class="lbl">要求</span>让每条建议说明依据、适用条件与下一步。</div>
+    </div>
+  </div>
+
+  <div class="card tint-teal" style="margin-top:2px">
+    <h3>闭环循环：把真实结果带回下一轮</h3>
+    <div class="sv-block">
+    <svg viewBox="0 0 1024 190" role="img" aria-label="闭环四步循环：输入、AI处理、人执行、结果回流" style="width:100%;min-width:780px;height:auto">
+      <g font-family="inherit">
+        <!-- 4 steps row with arrows -->
+        <rect x="16" y="50" width="215" height="96" rx="14" fill="#e0f7f2" stroke="#10b5a0"/>
+        <text x="123" y="84" text-anchor="middle" font-size="13" fill="#0a6d5e" font-weight="700">1 经验 + 好样本 + 材料</text>
+        <text x="123" y="106" text-anchor="middle" font-size="11" fill="#5c6a85">结合任务背景，构成本次输入</text>
+        <text x="123" y="126" text-anchor="middle" font-size="11" fill="#5c6a85">（参考：会议纪要的三种输入）</text>
+        <line x1="233" y1="98" x2="270" y2="98" stroke="#10b5a0" stroke-width="2" marker-end="url(#arr)"/>
+        <rect x="272" y="50" width="215" height="96" rx="14" fill="#e0f7f2" stroke="#10b5a0"/>
+        <text x="379" y="84" text-anchor="middle" font-size="13" fill="#0a6d5e" font-weight="700">2 AI 总结 · 分析 · 建议</text>
+        <text x="379" y="106" text-anchor="middle" font-size="11" fill="#5c6a85">整理事实，推演可能，提出方案</text>
+        <line x1="489" y1="98" x2="526" y2="98" stroke="#10b5a0" stroke-width="2" marker-end="url(#arr)"/>
+        <rect x="528" y="50" width="215" height="96" rx="14" fill="#e0f7f2" stroke="#10b5a0"/>
+        <text x="635" y="84" text-anchor="middle" font-size="13" fill="#0a6d5e" font-weight="700">3 人选择并执行</text>
+        <text x="635" y="106" text-anchor="middle" font-size="11" fill="#5c6a85">结合目标做取舍，把动作做出来</text>
+        <line x1="745" y1="98" x2="782" y2="98" stroke="#10b5a0" stroke-width="2" marker-end="url(#arr)"/>
+        <rect x="784" y="50" width="215" height="96" rx="14" fill="#0a8f7c" stroke="#10b5a0"/>
+        <text x="891" y="84" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">4 结果反馈 → 新经验</text>
+        <text x="891" y="106" text-anchor="middle" font-size="11" fill="#d6f5ef">发生了什么？哪些经验值得带下次？</text>
+        <path d="M 891 148 C 891 172, 123 172, 123 148" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arr)"/>
+        <text x="500" y="180" text-anchor="middle" font-size="11" fill="#b97706">经验回流：把采用的做法、实际结果与修正整理好，交给下一轮任务使用</text>
+      </g>
+    </svg>
+    </div>
+    <div class="note"><span class="lbl">会议纪要回传</span>负责人是否认领？期限是否明确？行动是否推进？——这些结果要回传成下一轮的经验。</div>
+  </div>
+</section>
+
+<!-- ============ 习惯三 ============ -->
+<section id="h3">
+  <div class="sec-head"><span class="sec-num">习惯 03</span><h2>模拟训练：让重要场景先发生一次</h2></div>
+  <p class="lead">借扩散生成的思路：<b>模拟数据为模型创造练习材料，模拟场景也能为人创造练习机会</b>。把高成本的真实试错，换成低成本的预演。</p>
+
+  <div class="grid g2">
+    <div class="card tint-violet">
+      <h3>让 AI 扮演对方，让你练习回应</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>真实场景</th><th>让 AI 扮演谁</th><th>你提前练什么</th></tr></thead>
+        <tbody>
+          <tr><td>向领导汇报</td><td>关心目标与资源的领导</td><td>讲清价值，回应资源与优先级问题</td></tr>
+          <tr><td>向客户介绍产品</td><td>有具体需求和异议的客户</td><td>简洁介绍，回答证据与价格追问</td></tr>
+          <tr><td>推进商业方案</td><td>持不同意见的合作伙伴</td><td>发现薄弱假设，准备替代安排</td></tr>
+        </tbody>
+      </table></div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:8px">给出真实背景，再做一轮或多轮练习。</p>
+      <div class="note warn"><span class="lbl">注意</span>模拟中得到的是线索与假设，真实需求还要在实际对话中确认。</div>
+    </div>
+
+    <div class="card tint-violet">
+      <h3>三轮沟通法：练到能接住追问</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>轮次</th><th>AI 怎么扮演</th><th>你练什么</th></tr></thead>
+        <tbody>
+          <tr><td>第一轮</td><td>进行正常沟通</td><td>把背景、价值和希望对方做的事说清楚</td></tr>
+          <tr><td>第二轮</td><td>提出异议并追问</td><td>回应证据、预算和优先级等具体问题</td></tr>
+          <tr><td>第三轮</td><td>再次进行对话</td><td>根据反馈修改表达，明确下一步</td></tr>
+        </tbody>
+      </table></div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:8px">客户可能追问：「你说能提高效率，证据是什么？」领导可能追问：「为什么现在做？需要占用谁的资源？」</p>
+      <div class="note"><span class="lbl">节奏</span>每次只追问一个问题，等你回答后再继续，结束后再给反馈。</div>
+    </div>
+  </div>
+
+  <div class="card tint-violet" style="margin-top:2px">
+    <h3>失败预演（Premortem）：在行动前找出薄弱环节</h3>
+    <p style="color:var(--muted);font-size:13.5px">假设一个月后方案失败了，回头看，原因是什么？先把可能的失败说出来，再找到<strong>今天就能采取的预防动作</strong>。</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>可能的失败原因</th><th>值得留意的信号</th><th>现在可以做什么</th></tr></thead>
+      <tbody>
+        <tr><td>没有找到真正的问题</td><td>对方始终只说「再看看」</td><td>了解目前怎么做，困难在哪里</td></tr>
+        <tr><td>收益缺少证据</td><td>反复追问效果与风险</td><td>准备真实案例，提议小范围验证</td></tr>
+        <tr><td>决策关系不清楚</td><td>认可方案却没有下一步</td><td>确认谁使用、谁批准、谁付费</td></tr>
+        <tr><td>实际资源跟不上</td><td>人员或资料迟迟不到位</td><td>核对可用资源，明确阶段安排</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><span class="lbl">落地</span>这些是待验证的假设——把最重要的一项转成一个具体行动。</div>
+  </div>
+</section>
+
+<!-- ============ 习惯四 ============ -->
+<section id="h4">
+  <div class="sec-head"><span class="sec-num">习惯 04</span><h2>先用起来：让思维走在工具前面</h2></div>
+  <p class="lead">这不是「马上用起来」，而是<b>「先建思维」</b>。今天做不成的任务也值得先交给 AI——先学会把问题说清楚、把任务拆开、把 AI 接进工作。</p>
+
+  <div class="grid g2">
+    <div class="card tint-amber">
+      <h3>为什么现在就要开始？</h3>
+      <div class="keyline" style="border-color:var(--amber)"><p style="margin:0;font-weight:700">时间压缩不经济：有些经验需要时间。</p></div>
+      <div class="flow">
+        <div class="flow-step"><span class="pill b3">1</span><div class="body"><h4>工具可以很快学会，判断需要真实经历</h4><p>会用 ≠ 会判断。判断力只能从一次次真实任务里长出来。</p></div></div>
+        <div class="flow-step"><span class="pill b3">2</span><div class="body"><h4>经历过客户追问，你更知道该补什么信息</h4><p>经验让你知道「下一步该问什么、备什么料」。</p></div></div>
+        <div class="flow-step"><span class="pill b3">3</span><div class="body"><h4>亲自拆过任务，工具更新后你更知道用在哪儿</h4><p>思维是地图，工具更新只是换更好的交通工具。</p></div></div>
+      </div>
+      <div class="note"><span class="lbl">结论</span>先用起来，就更早开始积累这些经历。</div>
+    </div>
+
+    <div class="card tint-amber">
+      <h3>先行思维框架：把任务「喂给」AI 前先想清楚</h3>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:8px">示例任务：根据客户对话理解需求，持续改进产品的介绍方式。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>先思考什么</th><th>放到销售场景里</th></tr></thead>
+        <tbody>
+          <tr><td>我要解决谁的问题</td><td>客户真正需要什么？我希望推进哪一步？</td></tr>
+          <tr><td>AI 需要哪些材料</td><td>产品资料、真实客户原话、已有异议与反馈</td></tr>
+          <tr><td>AI 可以参与哪些环节</td><td>模拟对话、整理需求线索、帮助改进表达</td></tr>
+          <tr><td>怎样判断结果有用</td><td>是否有依据，是否更贴近客户，能否支持下一步</td></tr>
+        </tbody>
+      </table></div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:8px">先用的过程中，你就在建立<strong>组织任务和调用 AI</strong> 的思维。当模型能力与条件成熟，已有思路就有机会更快落地。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 习惯五 ============ -->
+<section id="h5">
+  <div class="sec-head"><span class="sec-num">习惯 05</span><h2>主动分享：让自己的方法成为别人的能力</h2></div>
+  <p class="lead">分享不是「输出」，而是<b>「让方法被采用、被验证、再被传播」</b>。尤其分享给身边还不会使用 AI 的同事。</p>
+
+  <div class="grid g2">
+    <div class="card tint-rose">
+      <h3>为什么是「主动分享」</h3>
+      <p style="color:var(--muted);font-size:14px">技术扩散的典型样本：ChatGPT 上线约 <strong>2 个月</strong>就达到 <strong>1 亿月活跃用户</strong>（2023 年 1 月，UBS 基于 Similarweb 数据）。一个好的 AI 方法，同样能像这样一路扩散放大。</p>
+      <div class="sv-block">
+      <svg viewBox="0 0 520 150" role="img" aria-label="方法扩散的正向循环" style="width:100%;min-width:440px;height:auto">
+        <g text-anchor="middle" font-size="12">
+          <circle cx="90" cy="75" r="40" fill="#fdeaf3" stroke="#ec4899"/>
+          <text x="90" y="70" fill="#b81863" font-weight="700">方法</text>
+          <text x="90" y="88" fill="#d6336c" font-size="10">被采用</text>
+          <line x1="132" y1="70" x2="168" y2="52" stroke="#ec4899" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="132" y1="80" x2="168" y2="98" stroke="#ec4899" stroke-width="2" marker-end="url(#arr)"/>
+          <circle cx="252" cy="45" r="40" fill="#fdeaf3" stroke="#ec4899"/>
+          <text x="252" y="40" fill="#b81863" font-weight="700">新的案例</text>
+          <text x="252" y="58" fill="#d6336c" font-size="10">与使用场景</text>
+          <circle cx="252" cy="105" r="40" fill="#fdeaf3" stroke="#ec4899"/>
+          <text x="252" y="100" fill="#b81863" font-weight="700">真实的反馈</text>
+          <text x="252" y="118" fill="#d6336c" font-size="10">与不同结果</text>
+          <circle cx="430" cy="75" r="40" fill="#ec4899" stroke="#f472b6"/>
+          <text x="430" y="70" fill="#fff" font-weight="700">完善方法</text>
+          <text x="430" y="88" fill="#ffe7f1" font-size="10">继续传播</text>
+          <line x1="294" y1="45" x2="386" y2="70" stroke="#ec4899" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="294" y1="105" x2="386" y2="80" stroke="#ec4899" stroke-width="2" marker-end="url(#arr)"/>
+          <text x="430" y="145" font-size="11" fill="#b81863">价值等于分享：帮助别人成事，方法就有更多连接</text>
+        </g>
+      </svg>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px"><small><em>课堂数据：各技术统计口径不同，不作严格横向比较。</em></small></p>
+    </div>
+
+    <div class="card tint-rose">
+      <h3>一次有用的分享：带同事完成一件事</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>怎么做</th><th>一起完成什么</th><th>让对方带走什么</th></tr></thead>
+        <tbody>
+          <tr><td>挑一个问题</td><td>选择对方正在处理的小任务</td><td>清楚的目标与好结果的标准</td></tr>
+          <tr><td>一起做一次</td><td>用真实材料演示，解释关键判断</td><td>一份完整案例和参考样本</td></tr>
+          <tr><td>让同事自己做</td><td>换一份材料，请对方独立完成</td><td>可复用的提示词或工作流程</td></tr>
+          <tr><td>收回使用反馈</td><td>了解哪里卡住，哪里需要调整</td><td>改进后的做法与适用条件</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><span class="lbl">成功标准</span>对方能够独立完成，并知道哪些结果需要核对。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 系统关系 ============ -->
+<section id="system">
+  <div class="sec-head"><span class="sec-num">复盘</span><h2>五习惯的内在关系：一个自我增强的系统</h2></div>
+  <p class="lead">把这五件事连起来看，它是一套完整的<b>「输入 → 精进 → 演练 → 上手 → 放大」</b>升级回路，每一环都为下一环输送养分。</p>
+  <div class="card">
+    <div class="grid g4">
+      <div class="flow-step" style="align-items:flex-start"><span class="pill b0">①</span><div class="body"><h4>输入</h4><p>材料的厚度，决定 AI 理解的准度。</p></div></div>
+      <div class="flow-step" style="align-items:flex-start"><span class="pill b1">②</span><div class="body"><h4>闭环</h4><p>结果回流成新经验，标准越来越清楚。</p></div></div>
+      <div class="flow-step" style="align-items:flex-start"><span class="pill b2">③</span><div class="body"><h4>模拟</h4><p>重要场景先发生一次，降低真实试错成本。</p></div></div>
+      <div class="flow-step" style="align-items:flex-start"><span class="pill b3">④</span><div class="body"><h4>上手</h4><p>思维先跑，工具成熟时立刻能落。</p></div></div>
+    </div>
+    <div style="text-align:center;margin:14px 0"><span class="pill b4">⑤</span> <strong>分享 → 带回新案例与反馈 → 反向丰富「输入」资源与「经验池」</strong></div>
+    <div class="quote">你提供经验与判断，AI 帮你整理和推演，再一起把事情推进。
+      <small>——《AI 的发展历史与人和 AI 的融合哲学》</small>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 行动清单 ============ -->
+<section id="action">
+  <div class="sec-head"><span class="sec-num">落地</span><h2>一份可执行的启动清单</h2></div>
+  <div class="card">
+    <p class="lead" style="margin-bottom:6px">不必一次做全。从一个习惯、一项真实工作开始，把它做成、做透，再滚到下一个。</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:36px">#</th><th>本周可做的一件事</th><th>对应用的习惯</th><th>怎么算做到了</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>把一个高频任务的材料（日报/反馈/背景）整理进一个项目</td><td><span class="tag tag-blue">① 输入</span></td><td>交任务时能让 AI 读到完整材料</td></tr>
+        <tr><td>2</td><td>挑一个任务用「总结→分析→建议」跑一遍，并要求每条建议给依据</td><td><span class="tag tag-teal">② 闭环</span></td><td>拿到带依据、可取舍的行动清单</td></tr>
+        <tr><td>3</td><td>选一个本周要面对的沟通，做三轮 AI 模拟 + 一轮失败预演</td><td><span class="tag tag-violet">③ 模拟</span></td><td>能接住追问，并定下一个预防动作</td></tr>
+        <tr><td>4</td><td>把一件今天暂不能自动的任务，先拆出「谁来用、要什么料、AI 参与哪环」</td><td><span class="tag tag-amber">④ 上手</span></td><td>写出一行可交给 AI 的清晰指令</td></tr>
+        <tr><td>5</td><td>带一位不会用 AI 的同事，完成一项真实小任务并收回反馈</td><td><span class="tag tag-rose">⑤ 分享</span></td><td>对方能独立完成，并知道哪些结果要核对</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><span class="lbl">记住</span>目标是「借 AI 升级自己」，而不是「用更多的 AI」。每做一件事都问：这一轮，我又多沉淀了一点什么判断与经验？</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>内容依据：《AI 的发展历史与人和 AI 的融合哲学》课件整理与扩写</span>
+    <span>核心主张：经验 + 判断是人的主场，整理 + 推演交给 AI</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  try{
+    // 页内锚点平滑滚动（不拦截外部链接）
+    document.querySelectorAll('nav a[href^="#"]').forEach(function(a){
+      a.addEventListener('click', function(e){
+        var id = a.getAttribute('href').slice(1);
+        var el = document.getElementById(id);
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'}); }
+      });
+    });
+  }catch(err){/* 静默降级：静态内容仍可读 */ }
+})();
+</script>
+</body>
+</html>
