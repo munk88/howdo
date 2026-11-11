@@ -22,8 +22,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker run -d --name howdo-ci -e DOMAIN=http://localhost -p 127.0.0.1:18080:80 howdo-ci
-          curl --fail --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:18080/ -o /tmp/home.html
+          docker run -d --name howdo-ci -e DOMAIN=:80 -p 127.0.0.1:18080:80 howdo-ci
+          curl --fail --retry 20 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:18080/ -o /tmp/home.html
           grep -q '把问题弄懂' /tmp/home.html
           curl --fail http://127.0.0.1:18080/articles/portable-blog/ -o /dev/null
           curl --fail http://127.0.0.1:18080/rss.xml -o /dev/null
@@ -31,6 +31,15 @@ jobs:
           curl --fail http://127.0.0.1:18080/search-index.json -o /dev/null
           test "$(curl -s -o /tmp/404.html -w '%{http_code}' http://127.0.0.1:18080/not-a-real-page/)" = '404'
           grep -q '这条路' /tmp/404.html
+      - name: Export tested runtime image
+        run: |
+          docker tag howdo-ci howdo-blog:local
+          docker save howdo-blog:local | gzip > howdo-image-linux-amd64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: howdo-image-linux-amd64
+          path: howdo-image-linux-amd64.tar.gz
+          retention-days: 7
       - name: Container logs
         if: always()
         run: docker logs howdo-ci || true
