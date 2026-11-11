@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostRow from '../../components/PostRow.astro';
+import { posts, type Post } from '../../lib/posts';
+export async function getStaticPaths() { const all=await posts(); return [...new Set(all.flatMap(p=>p.data.tags))].map(tag=>({params:{tag},props:{tag,items:all.filter(p=>p.data.tags.includes(tag))}})); }
+interface Props { tag: string; items: Post[]; }
+const {tag,items}=Astro.props;
+---
+<Layout title={tag} description={`阅读 howdo.icu 中关于${tag}的文章。`}><section class="page-width inner-page"><a class="back-link" href="/topics/">← 全部主题</a><h1>{tag}</h1><p class="page-description">这个主题下，共 {items.length} 篇文章。</p><div class="archive-content">{items.map(post=><PostRow post={post}/>)}</div></section></Layout>

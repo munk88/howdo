@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+import { site } from '../config';
+interface Props { title?: string; description?: string; noindex?: boolean; }
+const { title, description = site.description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname === '/404/' ? '/404.html' : Astro.url.pathname, site.url).href;
+const fullTitle = title ? `${title} · ${site.name}` : `${site.name} — 把问题弄懂，把方法留下`;
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>{fullTitle}</title><meta name="description" content={description}/><link rel="canonical" href={canonical}/>
+<meta property="og:title" content={fullTitle}/><meta property="og:description" content={description}/><meta property="og:type" content="website"/><meta property="og:url" content={canonical}/><meta property="og:site_name" content={site.name}/><meta property="og:locale" content="zh_CN"/>
+<meta name="theme-color" content="#f8f7f3"/>{noindex && <meta name="robots" content="noindex, follow"/>}
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="alternate" type="application/rss+xml" title="howdo.icu RSS" href="/rss.xml"/>
+<script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url, description: site.description }).replaceAll('<', '\u003c')}/>
+</head><body>
+<a class="skip-link" href="#main">跳到正文</a>
+<header class="site-header"><div class="header-inner"><a class="wordmark" href="/" aria-label="howdo.icu 首页"><span class="brand-symbol" aria-hidden="true">h<span>↗</span></span>howdo<span class="brand-domain">.icu</span><span class="brand-dot"></span></a>
+<nav aria-label="主导航"><a href="/" aria-current={path === '/' ? 'page' : undefined}>首页</a><a href="/articles/" aria-current={path.startsWith('/articles') ? 'page' : undefined}>文章</a><a href="/topics/" aria-current={path.startsWith('/topics') ? 'page' : undefined}>主题</a><a href="/about/" aria-current={path === '/about/' ? 'page' : undefined}>关于</a></nav>
+<a class="header-search" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>搜索文章</span><kbd>/</kbd></a></div></header>
+<main id="main"><slot/></main>
+<footer class="site-footer"><div><a class="footer-brand" href="/">howdo.icu<span>把问题弄懂，把方法留下。</span></a><p>独立书写，持续整理。</p></div><div class="footer-links"><a href="/articles/">文章归档</a><a href="/rss.xml">RSS 订阅 ↗</a><a href="/about/">关于本站</a><span>© {new Date().getFullYear()} howdo.icu</span></div></footer>
+<script>
+ document.addEventListener('keydown', (event) => {
+  const target = event.target as HTMLElement;
+  if(event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT','TEXTAREA','SELECT'].includes(target.tagName) && !target.isContentEditable) { event.preventDefault(); if(location.pathname === '/search/') document.querySelector<HTMLInputElement>('#search')?.focus(); else location.href = '/search/'; }
+ });
+</script>
+</body></html>

@@ -1,0 +1,6 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { posts, tagUrl } from '../../lib/posts';
+const all=await posts(); const tags=[...new Set(all.flatMap(p=>p.data.tags))];
+---
+<Layout title="主题" description="从感兴趣的主题开始阅读 howdo.icu。"><section class="page-width inner-page"><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h1>从一个兴趣，继续探索。</h1><p class="page-description">把相近的问题放在一起，找起来更容易。</p><div class="topic-grid">{tags.map((tag,i)=><a class="topic-tile" href={tagUrl(tag)}><span class="tile-number">0{i+1} / TOPIC</span><h2>{tag}</h2><span>{all.filter(p=>p.data.tags.includes(tag)).length} 篇文章 <span>↗</span></span></a>)}</div></section></Layout>

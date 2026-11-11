@@ -1,0 +1,7 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostRow from '../../components/PostRow.astro';
+import { posts } from '../../lib/posts';
+const all = await posts(); const years = [...new Set(all.map(p=>p.data.date.getUTCFullYear()))];
+---
+<Layout title="文章归档" description="按时间浏览 howdo.icu 的全部文章。"><div class="page-width inner-page"><div class="eyebrow">THE ARCHIVE</div><h1>写下来的，都在这里。</h1><p class="page-description">共 {all.length} 篇文章。一些问题，一些探索，一些慢慢积累的方法。</p><div class="archive-content">{years.map(year => <section class="year-section"><h2>{year}<span>{all.filter(p=>p.data.date.getUTCFullYear() === year).length} 篇文章</span></h2>{all.filter(p=>p.data.date.getUTCFullYear() === year).map(post=><PostRow post={post}/>)}</section>)}</div></div></Layout>

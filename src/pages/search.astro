@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="搜索文章" description="搜索 howdo.icu 的文章标题、摘要、主题和正文。" noindex><section class="page-width inner-page search-page"><div class="eyebrow">FIND A NOTE</div><h1>找一找，你关心的问题。</h1><form class="search-form" role="search"><label for="search">搜索文章</label><div class="search-field"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="search" name="q" placeholder="试试 Markdown、迁移、Linux…" autocomplete="off"/><button type="submit">搜索 →</button></div></form><p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词，搜索标题、摘要与正文。</p><div id="search-results"></div><noscript><p>搜索需要 JavaScript。你也可以前往<a href="/articles/">文章归档</a>浏览全部文章。</p></noscript></section></Layout>
+<script>
+const input = document.querySelector<HTMLInputElement>('#search')!;
+const status = document.querySelector<HTMLElement>('#search-status')!;
+const results = document.querySelector<HTMLElement>('#search-results')!;
+type Item = { title: string; description: string; tags: string[]; text: string; url: string; example: boolean };
+let index: Item[] | null = null; let request: Promise<Item[]> | null = null; let version=0;
+async function search() {
+ const query=input.value.trim(); const current=++version;
+ const url = new URL(location.href); query ? url.searchParams.set('q',query) : url.searchParams.delete('q'); history.replaceState(null,'',url);
+ results.replaceChildren(); if(!query){status.textContent='输入关键词，搜索标题、摘要与正文。';return;}
+ status.textContent='正在查找…';
+ try {
+  if(!index) { request ??= fetch('/search-index.json').then(r=>{if(!r.ok)throw Error();return r.json();}).catch(error=>{request=null;throw error;}); index=await request; }
+  if(current!==version)return;
+  const words=query.toLocaleLowerCase().split(/\s+/); const found=index!.filter(p=>words.every(w=>`${p.title} ${p.description} ${p.tags.join(' ')} ${p.text}`.toLocaleLowerCase().includes(w)));
+  status.textContent=found.length ? `找到 ${found.length} 篇相关文章` : '没有找到相关文章。换个关键词，或者去文章归档看看。';
+  found.forEach(p=>{const article=document.createElement('article');article.className='search-result';const meta=document.createElement('span');meta.className='search-result-tags';meta.textContent=p.tags.join(' / ')+(p.example?' · 示例文章':'');const h=document.createElement('h2');const a=document.createElement('a');a.href=p.url;a.textContent=p.title;h.append(a);const desc=document.createElement('p');desc.textContent=p.description;article.append(meta,h,desc);results.append(article);});
+ } catch {if(current===version) status.textContent='搜索索引暂时无法加载，请稍后重试，或打开文章归档。';}
+}
+document.querySelector('form')!.addEventListener('submit',e=>{e.preventDefault();search();});
+let timer: ReturnType<typeof setTimeout>; input.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(search,150);});
+input.value=new URL(location.href).searchParams.get('q')??''; if(input.value)search(); input.focus();
+</script>
