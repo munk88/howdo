@@ -35,7 +35,7 @@ docker compose up -d --build
 
 更新前会先构建新镜像，构建失败不会直接替换已有容器。替换容器时可能有短暂中断；Caddy 的证书存储不变。
 
-GitHub Actions 会构建 Docker 镜像并测试 Caddy、文章、RSS 和 HTTP 404；不需要 SSH 密钥，也不会修改 VPS。正式域名的证书签发仍须在 VPS 上实际验收。
+GitHub Actions 会构建 Docker 镜像并测试 Caddy、文章、RSS 和 HTTP 404；不需要 SSH 密钥，也不会修改 VPS。正式域名的证书签发仍须在 VPS 上实际验收。每次成功构建还会生成可导入的 Linux amd64 镜像包，适合 Docker Hub 不可达的服务器，见部署文档。
 
 ## 本地预览与写作
 

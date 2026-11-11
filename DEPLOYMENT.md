@@ -109,3 +109,26 @@ ss -ltnp 'sport = :80 or sport = :443'
 
 - Caddy 自动 HTTPS：https://caddyserver.com/docs/automatic-https
 - Caddy 容器运行与持久卷：https://caddyserver.com/docs/running
+
+## 7. Docker Hub 不可达时：使用已测试的镜像包
+
+每次 main 构建通过后，Actions 会保留 7 天的 `howdo-image-linux-amd64` 产物。它是完整的 Linux amd64 运行镜像，适用于本次 VPS 架构；其他架构需要对应构建。
+
+在登录了 GitHub 的电脑上下载成功运行的产物（也可以在网页 Actions → 对应运行 → Artifacts 中下载）：
+
+```sh
+gh run list --repo munk88/howdo --branch main --status success
+gh run download <成功运行的ID> --repo munk88/howdo --name howdo-image-linux-amd64 --dir image-download
+```
+
+把解压得到的 `howdo-image-linux-amd64.tar.gz` 传到 VPS，在项目目录运行：
+
+```sh
+docker load -i howdo-image-linux-amd64.tar.gz
+docker compose up -d --no-build --pull never
+docker compose logs --tail=100 web
+```
+
+更新时下载新的成功构建产物，重复导入和启动即可。运行镜像包含对应提交生成的网页，不需要在 VPS 访问 Docker Hub 或 npm；Caddy 申请证书仍需要访问 ACME 服务。
+
+源码配置也有改动时，需同步更新 VPS 上的仓库。GitHub 访问困难时，可以在另一台电脑将仓库制成 `git bundle` 后私下传输；不要把 SSH 私钥放进源码包。

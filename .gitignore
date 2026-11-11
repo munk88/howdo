@@ -8,3 +8,4 @@ release/
 backups/
 *.key
 *.pem
+howdo-image-*.tar.gz

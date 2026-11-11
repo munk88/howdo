@@ -11,3 +11,4 @@ backups
 *.key
 *.pem
 *.log
+howdo-image-*.tar.gz
