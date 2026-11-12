@@ -1,74 +1,56 @@
 ---
-title: "把博客装进 Docker，HTTPS 交给 Caddy"
-description: "一次构建得到完整网站，文章、图片与自动 HTTPS 一起迁移。"
+title: "文章更新，只需要上传静态网页"
+description: "Caddy 留在 Docker 中，网页保存在宿主机；发文章不需要重建或重启容器。"
 date: 2026-11-08
+updated: 2026-11-12
 tags: [工具与方法, 独立博客]
 example: true
 ---
 
-静态博客的核心产物是一份普通文件目录。Docker 把构建环境和运行环境整理在一起，换一台服务器后可以使用同样的配置。
+个人博客可以把写作、网页生成和网站运行分开。文章更新时，只更换生成好的静态文件。
 
-## 两个阶段，各自做一件事
+## Caddy 和网页各放在哪里
 
-Dockerfile 的构建阶段使用 Node.js，安装锁定版本的依赖，并将 Markdown 和模板生成静态网页。
-
-运行阶段使用 Caddy 镜像，只包含网页产物和 Web 服务配置，不需要数据库，也不需要在 VPS 上单独安装 Node.js。
+Caddy 运行在 Docker 中，负责网站访问与自动 HTTPS。网页放在宿主机目录，通过只读挂载交给 Caddy。
 
 ```text
-Markdown + 图片 + 页面模板
-           ↓ Node 构建
-          dist/
-           ↓ 放入镜像
-     Caddy + 自动 HTTPS
+本地 Markdown + 图片
+        ↓ Astro 构建
+      静态网页
+        ↓ SSH 上传
+宿主机 site/releases/版本/
+宿主机 site/current → 当前版本
+        ↓ 只读挂载
+Docker 中的 Caddy 读取网页
 ```
 
-## 先确认域名和端口
+## 为什么不用每次重启容器
 
-域名的 A 记录需要指向 VPS 的公网 IPv4。如果配置了 AAAA，它也必须指向可达的正确服务器。
+Caddy 在处理文件请求时读取目录中的文件。网页更新后，新的请求就可以读取新的内容。容器本身和证书不需要随着每篇文章重新创建。
 
-Caddy 默认通过公网 80/443 端口处理访问和证书验证。云安全组与系统防火墙都需要允许 TCP 80、443。已有服务占用了端口时，先确认共用入口的方案。
+浏览器或 CDN 的缓存可能影响显示，应当同时检查内容版本与实际访问结果。
 
-## 一条命令启动
+## 先上传完整版本，再切换
 
-在已经安装 Docker Engine、Compose 插件和 Git 的服务器上：
+如果直接覆盖正在提供访问的目录，上传过程中可能出现部分文件已经更新、另一些仍然是旧版的情况。
+
+可以把每次构建放到独立目录，上传完成后原子切换 `current` 相对链接。Caddy 挂载整个父目录，就能读取切换后的文件。
+
+## 发布前后都要检查
+
+本地构建：
 
 ```sh
-git clone https://github.com/munk88/howdo.git
-cd howdo
-sh deploy/preflight.sh
-docker compose up -d --build
+npm run build
+npm run check:site
 ```
 
-预检脚本只显示系统、Docker、端口和域名解析，不会安装软件或修改防火墙。
+发布时使用项目里的 `scripts/publish-static.py`。它通过操作者电脑上的 SSH 密钥上传，服务器端检查失败时恢复上一版。
 
-## HTTPS 不需要手动续期
+发布后检查可信 HTTPS、文章、图片、搜索、RSS、站点地图和真实 HTTP 404。仅仅「上传完成」不能证明整次发布成功。
 
-Caddy 根据配置中的 `howdo.icu` 自动申请证书，并负责后续续期和 HTTP 跳转。
+## GitHub 只保存源码
 
-证书与 ACME 账户保存在持久卷 `howdo_caddy_data`。重建容器时保留这个卷，就能保留已有证书。
+GitHub 用来备份文章、图片和配置，也可以做构建检查。VPS 的网页由本地直接上传，不需要把服务器登录密钥交给 GitHub。
 
-```sh
-docker compose logs --tail=100 web
-curl -I https://howdo.icu
-```
-
-容器启动成功不等于证书签发成功。应当看到客户端正常信任的 HTTPS 响应，再检查文章、图片和订阅。
-
-## 写文章之后怎样更新
-
-本地编辑 Markdown，提交到 GitHub 后，在 VPS 上运行：
-
-```sh
-git pull --ff-only
-docker compose up -d --build
-```
-
-GitHub Actions 会检查 Docker 构建与 HTTP 服务，不自动登录服务器。正式域名的证书需要在实际 VPS 上验收。
-
-## 迁移时带走什么
-
-保存源码、文章和图片；额外保存 Caddy 证书卷。证书备份含私钥，应放在私有位置，不要上传公开仓库。
-
-新服务器准备好后，用相同配置启动，切换域名解析，并检查 HTTPS、文章链接和真实 HTTP 404。
-
-如果域名和文章路径保持不变，旧链接就可以继续使用。具体操作见仓库中的 `DEPLOYMENT.md` 与 `MIGRATION.md`。
+需要升级 Caddy 或修改容器参数时，再单独处理容器更新。日常写文章保持简单就好。

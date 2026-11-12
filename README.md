@@ -1,45 +1,12 @@
 # howdo.icu
 
-Astro + Markdown 独立博客，**Docker Compose + Caddy** 部署，Caddy 自动申请和续期 HTTPS 证书。
+Astro + Markdown 静态博客。**在电脑上构建网页，直接上传 VPS；Caddy 容器读取宿主机目录并管理 HTTPS。日常更新文章不重启容器。**
 
-- 正式域名：`howdo.icu`
-- 源码：<https://github.com/munk88/howdo>
+网站：<https://howdo.icu/>。源码备份：<https://github.com/munk88/howdo>。
 
-## VPS 首次部署
+## 日常写作与发布
 
-前提：服务器已有 Docker Engine、Docker Compose 插件和 Git；域名指向这台 VPS；80/443 TCP 对外可达且没有被其他服务占用。443 UDP 用于可选的 HTTP/3。
-
-```sh
-git clone https://github.com/munk88/howdo.git
-cd howdo
-sh deploy/preflight.sh
-docker compose up -d --build
-docker compose logs --tail=100 web
-```
-
-打开 **https://howdo.icu**。首次启动时，Caddy 会自动申请证书，之后自动续期并将 HTTP 跳转到 HTTPS。证书和 ACME 账户存放在 `howdo_caddy_data` 持久卷，重建容器会保留。
-
-默认不需要 `.env`，域名已经配好。不要运行 `docker compose down -v`，它会删除证书持久卷。
-
-构建在 Docker 内完成，VPS 不需要单独安装 Node.js。运行阶段只有一个 Caddy 容器，不需要数据库。
-
-## 后续更新
-
-本地写 Markdown → 提交 GitHub → 在 VPS 更新：
-
-```sh
-cd howdo
-git pull --ff-only
-docker compose up -d --build
-```
-
-更新前会先构建新镜像，构建失败不会直接替换已有容器。替换容器时可能有短暂中断；Caddy 的证书存储不变。
-
-GitHub Actions 会构建 Docker 镜像并测试 Caddy、文章、RSS 和 HTTP 404；不需要 SSH 密钥，也不会修改 VPS。正式域名的证书签发仍须在 VPS 上实际验收。每次成功构建还会生成可导入的 Linux amd64 镜像包，适合 Docker Hub 不可达的服务器，见部署文档。
-
-## 本地预览与写作
-
-Node.js 22.13 或以上（建议 Node 22 LTS）：
+用户把文章和图片交给当前博客工作目录中的助手，助手整理 Markdown、构建检查、直接上传 VPS 并验收。明确要求草稿时不发布。
 
 ```sh
 npm ci
@@ -47,24 +14,39 @@ npm run dev
 npm run new -- my-first-post "我的第一篇文章"
 ```
 
-文章：`src/content/blog/<slug>/index.md`。图片放在同一目录，使用 `![说明](./image.png)`。
+文章：`src/content/blog/<slug>/index.md`。图片放在同一目录，使用相对路径。
 
-本地只有 Docker 时，也可以用 HTTP 查看：
+发布脚本在使用者自己的电脑上执行，通过本地 SSH 密钥连接 VPS：
 
 ```sh
-DOMAIN=http://localhost HTTP_PORT=8080 HTTPS_PORT=8443 docker compose up -d --build
+npm run publish:site -- --host <VPS地址> --key <本地密钥路径> --known-hosts <已核实的known_hosts文件>
 ```
 
-访问 `http://localhost:8080`。不要把这组测试环境变量用于正式域名部署。
+脚本会构建和检查网站、上传完整版本、切换 `site/current`、检查 HTTPS 与版本标记；服务器端检查失败时恢复上一版。不执行 Docker 重建或重启，也不把密钥发送到 GitHub。
 
-## 已包含
+## 运行结构
 
-首页、文章归档、主题、文章目录、关于页、404、手机排版、全文搜索、RSS、Sitemap、canonical、Open Graph 和 JSON-LD。初始 4 篇指南明确标为示例，不代表站主经历，可以替换或删除。
+```text
+电脑：Markdown + 图片 → Astro 构建 → dist/
+                                  ↓ SSH 上传
+VPS：/opt/howdo/site/releases/<版本>/
+     /opt/howdo/site/current → releases/<版本>
+                 ↓ 父目录只读挂载为 /srv
+Docker：Caddy 从 /srv/current 提供网页，自动 HTTPS
+```
+
+`howdo_caddy_data` 和 `howdo_caddy_config` 持久保存证书和 Caddy 状态。只有改动容器参数、升级 Caddy 等运维操作才需要更新容器。
+
+当前 VPS 到 Docker Hub 的连接曾超时，所以切换时复用已有 Caddy 运行镜像，通过服务器 `.env` 中的 `CADDY_IMAGE` 指定。网页目录和 Caddyfile 都由宿主机只读挂载，镜像内旧网页不会被使用。新的、网络正常的 VPS 可以直接使用官方 `caddy:2-alpine`。
+
+## GitHub 的用途
+
+GitHub 保存源码，Actions 仅做静态构建和检查、保留静态产物，不连接 VPS、不保存服务器部署密钥。网站发布通过上面的本地脚本完成。
 
 ## 文档
 
-- [WRITING.md](WRITING.md)：写文章、插入图片、草稿和发布。
-- [DEPLOYMENT.md](DEPLOYMENT.md)：DNS、安全组、Docker 部署、HTTPS 和排障。
-- [MIGRATION.md](MIGRATION.md)：备份、恢复和更换 VPS。
+- [WRITING.md](WRITING.md)：写文章与草稿。
+- [DEPLOYMENT.md](DEPLOYMENT.md)：部署结构、直接上传、回退和常用操作。
+- [MIGRATION.md](MIGRATION.md)：备份、恢复与迁移。
 
-站点配置：`src/config.ts` 与 `astro.config.mjs`。静态构建产物在 `dist/`；成品和源码打包命令为 `npm run package`。域名不变时，更换 VPS 不需要修改文章链接。
+初始示例文章可替换或删除，不代表站主的个人经历。

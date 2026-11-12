@@ -43,7 +43,7 @@ draft: true
 3. 检查标题、图片、命令、手机排版和目录。
 4. 准备发布时保留 `draft: false`，未准备好则改回 `true`。
 5. 运行 `npm run build && npm run check:site`。
-6. 提交到自己的 GitHub 仓库并根据已配置的部署方式发布。
+6. 将源码提交 GitHub 作为备份，再由本地发布脚本直接上传 VPS。不会触发 GitHub 自动部署；不需要重启 Caddy 或 Docker。
 
 草稿不会进入页面、主题、全文搜索、RSS 或 Sitemap；但如果源码仓库公开，草稿源文件仍然公开。不要上传密码或私人笔记。
 

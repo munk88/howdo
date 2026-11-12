@@ -9,3 +9,6 @@ backups/
 *.key
 *.pem
 howdo-image-*.tar.gz
+site/
+__pycache__/
+*.pyc

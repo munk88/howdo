@@ -27,4 +27,4 @@ printf '\n当前容器\n'
 docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
 printf '\nCompose 配置\n'
 docker compose config --quiet
-printf '\n检查完成。请核对端口、DNS 与云安全组，再执行 docker compose up -d --build。\n'
+printf '\n检查完成。请核对端口、DNS 与云安全组，再执行 docker compose up -d。\n'

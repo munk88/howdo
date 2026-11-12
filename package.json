@@ -9,7 +9,8 @@
     "preview": "astro preview --host 127.0.0.1",
     "check:site": "node scripts/check-site.mjs",
     "new": "node scripts/new-post.mjs",
-    "package": "npm run build && npm run check:site && node scripts/package.mjs"
+    "package": "npm run build && npm run check:site && node scripts/package.mjs",
+    "publish:site": "python3 scripts/publish-static.py"
   },
   "dependencies": {
     "@astrojs/rss": "4.0.19",

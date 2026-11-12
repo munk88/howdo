@@ -1,12 +1,10 @@
 {$DOMAIN:howdo.icu} {
-    root * /srv
-    encode zstd gzip
-    file_server
-
-    # 由 Caddy 自动申请、续期证书，并将 HTTP 跳转到 HTTPS。
-    # 证书和 ACME 账户保存在 Docker 的 /data 持久卷。
-    handle_errors {
-        rewrite * /404.html
-        file_server
-    }
+	root * /srv/current
+	encode zstd gzip
+	header /__release.json Cache-Control "no-store"
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
 }

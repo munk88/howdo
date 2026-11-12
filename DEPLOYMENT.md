@@ -1,134 +1,64 @@
-# Docker 部署 howdo.icu
+# Caddy 容器 + 宿主机静态网页
 
-目标：`howdo.icu` → 你的 VPS → Docker 内的 Caddy → Astro 静态网页。
+## 当前布局
 
-## 1. DNS 与端口
+部署根目录为 `/opt/howdo`：
 
-在域名 DNS 控制台添加或修改：
-
-| 类型 | 名称 | 值 |
-| --- | --- | --- |
-| A | @ | 你的 VPS 公网 IPv4 |
-
-如果已有 AAAA 记录，必须指向这台 VPS 可达的 IPv6；没有可用 IPv6 就移除不正确的 AAAA，避免部分访问和 ACME 验证走错服务器。不要改动邮件等无关记录。
-
-首次排障建议直连源站。若使用 CDN/代理，需确保验证请求可抵达 Caddy，且源站 HTTPS 和 CDN TLS 模式一致。可在 DNS 与证书正常后再启用 CDN。
-
-本版只配置裸域名 `howdo.icu`，没有启用 `www`，不需要为未配置的 `www` 申请证书。
-
-如果 VPS 使用腾讯云安全组或其他云防火墙，放行入站 **TCP 80、TCP 443**。UDP 443 为可选 HTTP/3。系统防火墙也需要允许相同端口，保留现有 SSH 入口。
-
-80/443 若被已有 Nginx、Caddy 或容器占用，应先规划共用入口，不要直接停用其他业务。
-
-## 2. 检查系统与 Docker
-
-登录 VPS 后先查看：
-
-```sh
-uname -s
-cat /etc/os-release
-id
-command -v docker
-docker version
-docker compose version
-ss -ltnp 'sport = :80 or sport = :443'
+```text
+compose.yaml               容器配置
+deploy/Caddyfile            Caddy 配置
+.env                       可选的本机镜像配置，不提交 Git
+site/releases/<版本>/       每次发布的完整静态网页
+site/current                相对符号链接，指向正在使用的版本
 ```
 
-若没有 Docker，请按实际系统参考官方安装说明：
+Compose 将整个 `site/` 只读挂载到 `/srv`，Caddy 从 `/srv/current` 读取网页。必须挂载父目录，不能直接把 `site/current` 作为挂载源，否则切换符号链接时容器可能仍使用旧目录。
 
-- https://docs.docker.com/engine/install/
-- https://docs.docker.com/compose/install/linux/
+Caddy 容器负责 80/443 访问、HTTP→HTTPS 跳转、证书申请和续期。证书卷固定为 `howdo_caddy_data`、`howdo_caddy_config`。
 
-不要在不知道系统和已有服务状态时直接套用安装脚本。
+## 直接发布文章
 
-## 3. 部署
+在电脑上安装 Node.js 22.13 或以上、Python 3、OpenSSH 和 curl。本地依赖首次安装使用 `npm ci`。
 
 ```sh
-git clone https://github.com/munk88/howdo.git
-cd howdo
-sh deploy/preflight.sh
-docker compose up -d --build
+npm run publish:site -- --host <VPS地址> --key <本地SSH密钥路径> --known-hosts <已核实的known_hosts文件>
+```
+
+可选：`--user`、`--port`、`--site-dir`。默认用户 root、端口 22、站点目录 `/opt/howdo/site`；当前仅通过用户本地登录权限执行，不配置 GitHub 自动部署。
+
+过程：
+
+1. 构建并检查网页。
+2. 将 `dist/` 和非敏感发布标记打包，通过 SSH 上传。
+3. 在新版本目录解压，检查必要文件。
+4. 原子切换 `current`，避免边上传边提供不完整文件。
+5. 使用证书校验开启的 HTTPS 检查版本、首页、订阅、站点地图、搜索索引和真实 404。
+6. 服务器端验收失败时恢复上一链接；成功后再检查公网发布标记。
+
+公开的 `/__release.json` 只包含版本标记和内容摘要，不含凭据。发布脚本不会调用 Docker。
+
+## 首次准备或更换服务器
+
+1. 检查系统、Docker Compose、80/443 占用、DNS 和云安全组。
+2. 将项目配置放在 `/opt/howdo`。
+3. 创建 `site/releases/initial/`，将完整静态网页解压进去。
+4. 创建相对链接：`ln -s releases/initial site/current`。
+5. 网络正常时使用默认官方 Caddy 镜像，执行 `docker compose up -d`。
+6. 验收可信 HTTPS 和网页，然后使用发布脚本更新。
+
+当前 VPS 因 Docker Hub 超时复用了已安装的 Caddy 运行环境，在 `.env` 使用 `CADDY_IMAGE=howdo-caddy:existing`。此镜像来自此前部署，已有的内嵌网页被 `/srv` 挂载遮蔽，实际提供的是宿主机文件。迁移或重装时保留镜像备份，或在能拉取官方镜像的环境使用 `caddy:2-alpine`。
+
+## 常用操作
+
+```sh
+cd /opt/howdo
 docker compose ps
 docker compose logs --tail=100 web
+readlink site/current
 ```
 
-初次构建需要从 Docker Hub 拉取 Node/Caddy 镜像，并从 npm 获取锁定版本的依赖。网络受限时先解决镜像和 npm 连通性；不要因下载失败反复删库或重置 Docker。
+日常文章更新不用运行 `docker compose up`、`restart` 或构建镜像。
 
-无需 `.env`。`compose.yaml` 默认使用 `DOMAIN=howdo.icu`，发布 80/443 TCP 和 443 UDP。
+保留了旧版本时，可以在 `site/` 目录创建新的相对链接，再通过 `mv -Tf` 替换 `current`，实现回退。检查目标版本完整、链接仍位于 `releases/` 中，并在回退后验收网站。
 
-Dockerfile 分两阶段：Node 构建并检查网站，Caddy 镜像只带静态网页和 Web 配置。
-
-## 4. 自动 HTTPS
-
-Caddyfile 使用域名作为站点地址，默认开启自动 HTTPS。证书的申请、续期和 HTTP→HTTPS 跳转由 Caddy 管理，不需要另装 Certbot 或 cron。
-
-证书成功的条件是 DNS 正确、80/443 对公网可达、服务器出站可联系 ACME CA、持久卷可写，以及 CAA 等域名策略允许签发。容器启动成功不代表证书已经签发成功。
-
-通过以下方式验证：
-
-```sh
-curl -I http://howdo.icu
-curl -I https://howdo.icu
-curl -s -o /dev/null -w '%{http_code}\n' https://howdo.icu/this-page-does-not-exist/
-docker compose logs --tail=100 web
-```
-
-预期 HTTP 跳转 HTTPS；HTTPS 首页返回 200，证书由客户端正常信任；不存在的路径返回 404。还应打开文章、图片、搜索、`/rss.xml` 和 `/sitemap-index.xml`。
-
-不要用 `curl -k` 作为 HTTPS 成功证明。
-
-## 5. 写作和更新
-
-在本地编辑文章并推送 GitHub，VPS 上运行：
-
-```sh
-cd howdo
-git pull --ff-only
-docker compose up -d --build
-```
-
-初次从空仓库发布后，默认 `main` 上的 GitHub Actions 负责 Docker 构建与 HTTP 冒烟测试，不自动登录服务器。无需把服务器密码或私钥放进仓库。
-
-容器重建不影响 `howdo_caddy_data` 和 `howdo_caddy_config`。正常停用可执行 `docker compose down`；不要添加 `-v`，除非确实准备删除证书数据。
-
-## 6. 常用排障
-
-```sh
-docker compose ps
-docker compose logs --tail=200 web
-docker compose config
-ss -ltnp 'sport = :80 or sport = :443'
-```
-
-- `address already in use`：先确认占用者，决定共用入口或调整部署，不要强杀未知服务。
-- ACME timeout：检查 DNS、AAAA、云安全组、系统防火墙与公网端口。
-- 构建下载失败：区分 Docker Hub 镜像拉取与容器内 npm 下载，两者走的网络配置可能不同。
-- 更新后内容没变：检查 Git 提交、Docker 构建结果，以及浏览器/CDN 缓存。
-
-## 官方参考
-
-- Caddy 自动 HTTPS：https://caddyserver.com/docs/automatic-https
-- Caddy 容器运行与持久卷：https://caddyserver.com/docs/running
-
-## 7. Docker Hub 不可达时：使用已测试的镜像包
-
-每次 main 构建通过后，Actions 会保留 7 天的 `howdo-image-linux-amd64` 产物。它是完整的 Linux amd64 运行镜像，适用于本次 VPS 架构；其他架构需要对应构建。
-
-在登录了 GitHub 的电脑上下载成功运行的产物（也可以在网页 Actions → 对应运行 → Artifacts 中下载）：
-
-```sh
-gh run list --repo munk88/howdo --branch main --status success
-gh run download <成功运行的ID> --repo munk88/howdo --name howdo-image-linux-amd64 --dir image-download
-```
-
-把解压得到的 `howdo-image-linux-amd64.tar.gz` 传到 VPS，在项目目录运行：
-
-```sh
-docker load -i howdo-image-linux-amd64.tar.gz
-docker compose up -d --no-build --pull never
-docker compose logs --tail=100 web
-```
-
-更新时下载新的成功构建产物，重复导入和启动即可。运行镜像包含对应提交生成的网页，不需要在 VPS 访问 Docker Hub 或 npm；Caddy 申请证书仍需要访问 ACME 服务。
-
-源码配置也有改动时，需同步更新 VPS 上的仓库。GitHub 访问困难时，可以在另一台电脑将仓库制成 `git bundle` 后私下传输；不要把 SSH 私钥放进源码包。
+不要运行 `docker compose down -v` 删除证书卷。GitHub Actions 仅做静态检查，不负责部署。
